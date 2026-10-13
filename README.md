@@ -21,6 +21,7 @@ Web also works for a quick look (`npx expo start --web`), but notifications and 
 npm run typecheck   # app + tests
 npm test            # logic tests (node:test, no device needed)
 npm run lint
+npm run e2e         # browser smoke tests on the web build (first time: npx playwright install chromium)
 ```
 
 ## Structure

@@ -45,3 +45,6 @@ example
 # local
 dist/
 .write_test
+dist-e2e/
+test-results/
+playwright-report/
