@@ -168,6 +168,7 @@ export default function Settings() {
 
       <AppText variant="label">About</AppText>
       <Card style={styles.group}>
+        <Button kind="secondary" title="How it works" onPress={() => router.push('/how-it-works')} />
         <AppText variant="small">
           Shift to Life keeps everything on this phone. There is no account and no tracking.
         </AppText>

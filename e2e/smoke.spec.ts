@@ -225,3 +225,13 @@ test('when rest would run past bedtime, the app offers ways to make it fit', asy
   await tap(page, 'Start now');
   await expect(page.getByText('Resting', { exact: true })).toBeVisible();
 });
+
+test('the how-it-works guide opens from settings', async ({ page }) => {
+  await open(page);
+  await onboard(page);
+  await tap(page, 'Settings');
+  await tap(page, 'How it works');
+  await expect(page.getByText('Work earns rest', { exact: true })).toBeVisible();
+  await page.getByText('Done', { exact: true }).last().click(); // Settings stays mounted underneath
+  await expect(page.getByText('Work earns rest', { exact: true })).toBeHidden();
+});
