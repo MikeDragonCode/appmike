@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import {
   HabitItem,
+  MIN_SLOT_MINS,
   UserData,
   activeHabits,
   availableMins,
@@ -93,7 +94,12 @@ export default function Today() {
           {hint.text}
         </AppText>
         {hint.kind === 'close' ? (
-          <Button title="Close the day" onPress={() => router.push('/close-day')} />
+          <>
+            <Button title="Close the day" onPress={() => router.push('/close-day')} />
+            {avail >= MIN_SLOT_MINS ? (
+              <Button kind="secondary" title="Book rest" onPress={() => router.push('/book')} />
+            ) : null}
+          </>
         ) : avail < data.profile.defaultSlotMins && firstFocus ? (
           <Button
             title={`Start ${firstFocus.name}`}
