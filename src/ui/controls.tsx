@@ -75,7 +75,7 @@ export function Divider() {
 const styles = StyleSheet.create({
   chip: {
     paddingHorizontal: 14,
-    paddingVertical: 10,
+    paddingVertical: 12,
     borderRadius: radius.pill,
     borderWidth: 1,
     borderColor: colors.border,
@@ -87,8 +87,8 @@ const styles = StyleSheet.create({
   stepRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   stepValue: { minWidth: 64 },
   stepBtn: {
-    width: 40,
-    height: 40,
+    width: 44,
+    height: 44,
     borderRadius: radius.pill,
     backgroundColor: colors.surfaceHigh,
     alignItems: 'center',

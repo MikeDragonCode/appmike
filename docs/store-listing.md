@@ -4,7 +4,7 @@ Everything here is a draft. Check names and claims before publishing.
 
 ## Name and tagline
 
-- Name: Shift to Life (name availability in both stores not checked yet)
+- Name: Shift to Life (web search on 13 Oct 2026 found no app with this exact name; the stores only confirm at creation. Many shift-worker scheduling apps use "shift" in their names, so search results may attract the wrong audience. Keep an alternative ready.)
 - Subtitle (App Store, 30 chars): Earn rest. Book it. Take it.
 - Short description (Google Play, 80 chars): Turn work into rest you actually take. Plan it, book it, enjoy it.
 
