@@ -46,7 +46,7 @@ Rule of thumb: rules of the product live in `src/core` and get a test first. Scr
 
 ## Not done yet
 
-- Real icon, splash and the final app name check.
+- Final app name check (the icon is a simple placeholder: two arcs, work and rest).
 - Store listings, privacy policy, subscriptions.
 - Follow-up questionnaire after day 3, 7 and 14.
 - Device testing on Android and iOS beyond Expo Go.
