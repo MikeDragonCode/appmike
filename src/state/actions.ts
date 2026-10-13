@@ -1,0 +1,94 @@
+import {
+  BookError,
+  FinishOutcome,
+  Slot,
+  bookSlot,
+  finishSlot,
+  logGrind,
+  startSlot,
+  addMinutes,
+} from '@/core';
+import {
+  cancelSlotNotifications,
+  ensurePermission,
+  scheduleSlotEnd,
+  scheduleSlotStart,
+} from '@/services/notifications';
+import { Focus, getState, setFocus, updateData } from './store';
+
+// Everything that changes data AND has side effects (reminders, timers)
+// lives here, so screens stay thin and core stays pure.
+
+export function newId(prefix: string): string {
+  return `${prefix}_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+}
+
+export const BOOK_ERRORS: Record<BookError, (shortBy?: number, bedtime?: string) => string> = {
+  unknown_activity: () => 'That activity no longer exists.',
+  not_rest_activity: () => 'Pick a timed rest activity.',
+  too_short: () => 'Rest slots start at 5 minutes.',
+  in_the_past: () => 'That time has already passed.',
+  past_bedtime: (_s, bedtime) => `Your bedtime rule: rest has to end by ${bedtime}.`,
+  over_limit: (shortBy) => `That is ${shortBy} min more than you have. Work a bit first, or pick a shorter slot.`,
+};
+
+// Books a slot. "Now" slots start right away; later ones get a reminder.
+export async function book(input: {
+  habitId: string;
+  plannedMins: number;
+  startsAt: Date | null; // null = now
+}): Promise<{ ok: true; slot: Slot; startedNow: boolean } | { ok: false; error: BookError; shortBy?: number }> {
+  const data = getState().data;
+  if (!data) return { ok: false, error: 'unknown_activity' };
+  const now = new Date();
+  const startsAt = input.startsAt ?? now;
+  const r = bookSlot(data, { id: newId('s'), habitId: input.habitId, plannedMins: input.plannedMins, startsAt, now });
+  if (!r.ok) return r;
+  updateData(() => r.data);
+  const habit = data.habits.find((h) => h.id === input.habitId);
+  if (input.startsAt === null) {
+    await beginSlot(r.slot.id);
+    return { ok: true, slot: r.slot, startedNow: true };
+  }
+  if (habit && (await ensurePermission())) await scheduleSlotStart(r.slot, habit.name);
+  return { ok: true, slot: r.slot, startedNow: false };
+}
+
+export async function beginSlot(slotId: string): Promise<void> {
+  const data = getState().data;
+  const slot = data?.slots.find((s) => s.id === slotId);
+  if (!data || !slot || slot.state !== 'planned') return;
+  const now = new Date();
+  updateData((d) => startSlot(d, slotId, now));
+  const habit = data.habits.find((h) => h.id === slot.habitId);
+  await cancelSlotNotifications(slotId);
+  if (habit && (await ensurePermission())) {
+    await scheduleSlotEnd(slot, habit.name, addMinutes(now, slot.plannedMins));
+  }
+}
+
+// Closes a slot with the minutes really used (0 = skipped).
+export async function endSlot(slotId: string, actualMins: number): Promise<FinishOutcome | null> {
+  const data = getState().data;
+  if (!data) return null;
+  const r = finishSlot(data, slotId, actualMins, new Date());
+  if (!r) return null;
+  updateData(() => r.data);
+  await cancelSlotNotifications(slotId);
+  return r.outcome;
+}
+
+export function startFocus(habitId: string): void {
+  const f: Focus = { habitId, startedAt: new Date().toISOString() };
+  setFocus(f);
+}
+
+// Logs work time. Returns the rest minutes earned, or null if nothing was logged.
+export function logWork(habitId: string, minutes: number): number | null {
+  const data = getState().data;
+  if (!data || !(minutes > 0)) return null;
+  const r = logGrind(data, habitId, minutes, new Date());
+  if (!r) return null;
+  updateData(() => r.data);
+  return r.earned;
+}
