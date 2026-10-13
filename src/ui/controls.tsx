@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
   stepper: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space.md },
   stepLabel: { flexShrink: 1 },
   stepRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
-  stepValue: { minWidth: 76 },
+  stepValue: { minWidth: 64 },
   stepBtn: {
     width: 40,
     height: 40,

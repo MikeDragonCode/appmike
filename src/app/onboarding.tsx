@@ -334,7 +334,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   emojiInput: { width: 56, textAlign: 'center' },
-  nameInput: { flex: 1 },
+  nameInput: { flex: 1, minWidth: 0 },
   addBtn: { height: 48, paddingHorizontal: 16, borderRadius: radius.sm, backgroundColor: colors.text, justifyContent: 'center' },
   addOff: { opacity: 0.35 },
   addText: { fontWeight: '600' },

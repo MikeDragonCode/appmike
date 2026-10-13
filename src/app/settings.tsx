@@ -85,6 +85,8 @@ export default function Settings() {
         />
       </Card>
 
+      <Button kind="secondary" title="Work and rest activities" onPress={() => router.push('/activities')} />
+
       <AppText variant="label">Rest rules</AppText>
       <Card style={styles.group}>
         <Stepper

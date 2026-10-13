@@ -79,6 +79,15 @@ describe('todayHint', () => {
     assert.equal(todayHint(closeDay(d, TUE_EVENING), TUE_EVENING).kind, 'closed');
   });
 
+  it('prefers booking saved rest over closing the day in the evening', () => {
+    const d = logGrind(makeData(), 'g1', 240, TUE_EVENING)!.data; // 120 saved
+    assert.equal(todayHint(d, TUE_EVENING).kind, 'book');
+  });
+
+  it('does not ask to close a day with nothing in it', () => {
+    assert.equal(todayHint(makeData(), TUE_EVENING).kind, 'start');
+  });
+
   it('uses the profile slot length as the booking threshold', () => {
     const d = makeData({ earnedTimeBank: 40, profile: { ...defaultProfile, defaultSlotMins: 30 } });
     assert.equal(todayHint(d, TUE_NOON).kind, 'book');

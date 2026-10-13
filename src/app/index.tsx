@@ -5,6 +5,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import {
   HabitItem,
   UserData,
+  activeHabits,
   availableMins,
   dateToStr,
   doneSlotsLast7,
@@ -43,7 +44,8 @@ export default function Today() {
   const nextHabit = next ? data.habits.find((h) => h.id === next.habitId) : undefined;
   const hint = todayHint(data, now);
   const day = summarizeDay(data, now);
-  const grind = data.habits.filter((h) => h.type === 'grind');
+  const grind = activeHabits(data, 'grind');
+  const firstFocus = grind.find((h) => h.valueType === 'duration');
   const todayLog = getLog(data, dateToStr(now));
   const focusHabit = focus ? data.habits.find((h) => h.id === focus.habitId) : undefined;
   const yesterday = new Date(now);
@@ -92,6 +94,12 @@ export default function Today() {
         </AppText>
         {hint.kind === 'close' ? (
           <Button title="Close the day" onPress={() => router.push('/close-day')} />
+        ) : avail < data.profile.defaultSlotMins && firstFocus ? (
+          <Button
+            title={`Start ${firstFocus.name}`}
+            accent={colors.grind}
+            onPress={() => router.push({ pathname: '/focus', params: { habitId: firstFocus.id } })}
+          />
         ) : (
           <Button title="Book rest" accent={colors.glow} onPress={() => router.push('/book')} />
         )}

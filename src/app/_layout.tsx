@@ -107,6 +107,7 @@ export default function RootLayout() {
           <Stack.Protected guard={onboarded}>
             <Stack.Screen name="index" />
             <Stack.Screen name="settings" />
+            <Stack.Screen name="activities" />
             <Stack.Screen name="book" options={{ presentation: 'modal' }} />
             <Stack.Screen name="close-day" options={{ presentation: 'modal' }} />
             <Stack.Screen name="checkin" options={{ presentation: 'modal' }} />

@@ -10,6 +10,8 @@ export interface HabitItem {
   costRate?: number;
   // when this glow fits the day (used by suggestions)
   window?: 'any' | 'morning' | 'day' | 'evening';
+  // Removed by the user. Kept so past days and open slots still resolve it.
+  archived?: boolean;
 }
 
 export interface ItemLog {

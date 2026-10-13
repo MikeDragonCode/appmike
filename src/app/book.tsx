@@ -2,7 +2,7 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { MIN_SLOT_MINS, addMinutes, availableMins, bookSlot, glowCost, isRestDay } from '@/core';
+import { MIN_SLOT_MINS, activeHabits, addMinutes, availableMins, bookSlot, glowCost, isRestDay } from '@/core';
 import { BOOK_ERRORS, book } from '@/state/actions';
 import { useStore } from '@/state/store';
 import { useNow } from '@/hooks/useNow';
@@ -30,7 +30,7 @@ export default function BookRest() {
   const router = useRouter();
   const { data } = useStore();
   const now = useNow(15_000);
-  const rest = data?.habits.filter((h) => h.type === 'glow' && h.valueType === 'duration') ?? [];
+  const rest = data ? activeHabits(data, 'glow').filter((h) => h.valueType === 'duration') : [];
   const [habitId, setHabitId] = useState(rest[0]?.id ?? '');
   const [mins, setMins] = useState(data?.profile.defaultSlotMins ?? 60);
   const [startsAt, setStartsAt] = useState<Date | null>(null); // null = now

@@ -46,16 +46,19 @@ export function todayHint(data: UserData, now: Date): { kind: HintKind; text: st
   const avail = Math.floor(availableMins(data));
   const closed = isDayClosed(data, now);
   const afterWork = minutesOfDay(now) >= parseHM(data.profile.workEnd);
-  const worked = summarizeDay(data, now).workMins > 0 || (getLog(data, dateToStr(now))?.grindLogs.length ?? 0) > 0;
+  const log = getLog(data, dateToStr(now));
+  const worked = (log?.grindLogs.length ?? 0) > 0;
+  const active = worked || (log?.glowLogs.length ?? 0) > 0;
 
   if (avail < 0) {
     return { kind: 'debt', text: `You borrowed ${-avail} min of rest ahead. Your next focus block pays it back.` };
   }
-  if (!closed && afterWork) {
-    return { kind: 'close', text: 'The workday is over. Close it when you are ready.' };
-  }
   if (avail >= data.profile.defaultSlotMins && !nextOpenSlot(data)) {
     return { kind: 'book', text: `You have ${avail} min of rest saved. Book it so it actually happens.` };
+  }
+  // Only ask to close a day that had something in it.
+  if (!closed && afterWork && active) {
+    return { kind: 'close', text: 'The workday is over. Close it when you are ready.' };
   }
   if (closed) return { kind: 'closed', text: 'Day closed. Rest well.' };
   if (!worked && !isRestDay(data, now)) {

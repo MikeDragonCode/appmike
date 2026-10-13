@@ -155,8 +155,8 @@ export default function Focus() {
         </AppText>
       ) : null}
       <Stepper
-        label="Already done, minutes"
-        value={`${manual}`}
+        label="Time already done"
+        value={`${manual} min`}
         onMinus={() => setManual(Math.max(5, manual - 5))}
         onPlus={() => setManual(Math.min(600, manual + 5))}
         minusDisabled={manual <= 5}
