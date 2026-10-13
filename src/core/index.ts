@@ -5,6 +5,7 @@ export * from './bank';
 export * from './day';
 export * from './slots';
 export * from './adjust';
+export * from './history';
 export * from './summary';
 export * from './maintenance';
 export * from './recap';

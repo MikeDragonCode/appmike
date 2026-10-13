@@ -168,3 +168,27 @@ test('a running slot can be extended', async ({ page }) => {
   await tap(page, 'Finish');
   await expect(page.getByText('Rest taken: 45 min. Well spent.')).toBeVisible();
 });
+
+test('history lets you fix an entry and the bank follows', async ({ page }) => {
+  await open(page);
+  await onboard(page);
+  await logDeepWork(page, 120); // 60 saved
+  await tap(page, 'History');
+  await expect(page.getByText('Work 2h, rest 0m')).toBeVisible();
+  for (let i = 0; i < 6; i++) await page.getByLabel('Decrease 💻 Deep Work').click();
+  await expect(page.getByText('Work 1h 30m, rest 0m')).toBeVisible();
+  await tap(page, 'Done');
+  await expect(page.getByText('Today earned 45m, spent 0m.')).toBeVisible();
+});
+
+test('history can add something that was forgotten', async ({ page }) => {
+  await open(page);
+  await onboard(page);
+  await logDeepWork(page, 60);
+  await tap(page, 'History');
+  await tap(page, 'Add an entry');
+  await page.getByRole('button', { name: /Workout/ }).click();
+  await expect(page.getByText('Work 1h 30m, rest 0m')).toBeVisible(); // 60 + 30
+  await tap(page, 'Done');
+  await expect(page.getByText('Today earned 53m, spent 0m.')).toBeVisible(); // 30 + 22.5, rounded
+});

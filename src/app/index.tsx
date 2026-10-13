@@ -253,6 +253,7 @@ export default function Today() {
               Rest taken on purpose: {Math.min(doneSlotsLast7(data, now), 99)} of {goal} this week.
             </AppText>
           ) : null}
+          <Button small kind="ghost" title="History" style={styles.recapBtn} onPress={() => router.push('/history')} />
         </Card>
       </View>
 
