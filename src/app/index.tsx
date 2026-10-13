@@ -10,6 +10,7 @@ import {
   availableMins,
   dateToStr,
   doneSlotsLast7,
+  dismissRecap,
   dueCheckin,
   getLast7Days,
   getLog,
@@ -20,6 +21,7 @@ import {
   reservedMins,
   summarizeDay,
   todayHint,
+  weeklyRecap,
 } from '@/core';
 import { updateData, useStore } from '@/state/store';
 import { useNow } from '@/hooks/useNow';
@@ -53,6 +55,7 @@ export default function Today() {
   yesterday.setDate(yesterday.getDate() - 1);
   const firstTask = summarizeDay(data, yesterday).tomorrowFirst;
   const checkin = dueCheckin(data, now);
+  const recap = weeklyRecap(data, now);
   const streak = getSoftStreak(data, now);
   const goal = data.profile.weeklySlotGoal;
   const week = getLast7Days(data, now);
@@ -115,6 +118,31 @@ export default function Today() {
         <Card onPress={() => router.push('/checkin')}>
           <AppText variant="label">Day {checkin} check-in</AppText>
           <AppText variant="body">Is the same thing still the hardest? Two minutes to tune your plan.</AppText>
+        </Card>
+      ) : null}
+
+      {recap ? (
+        <Card>
+          <AppText variant="label">Your week</AppText>
+          <AppText variant="body">
+            You worked {fmtMins(recap.workMins)} and rested {fmtMins(recap.restMins)}.
+          </AppText>
+          {recap.restSlots > 0 ? (
+            <AppText variant="small">
+              {recap.restSlots} rest {recap.restSlots === 1 ? 'slot' : 'slots'} taken on purpose.
+            </AppText>
+          ) : null}
+          {recap.goodDays > 0 ? (
+            <AppText variant="small">
+              {recap.goodDays} good {recap.goodDays === 1 ? 'day' : 'days'}.
+            </AppText>
+          ) : null}
+          {recap.slotGoal > 0 ? (
+            <AppText variant="small">
+              {recap.restSlots >= recap.slotGoal ? 'Weekly rest goal reached.' : `The goal was ${recap.slotGoal}. A new week starts now.`}
+            </AppText>
+          ) : null}
+          <Button small kind="secondary" title="Got it" style={styles.recapBtn} onPress={() => updateData((d) => dismissRecap(d, new Date()))} />
         </Card>
       ) : null}
 
@@ -222,6 +250,7 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   bank: { gap: space.sm, padding: space.xl },
   hint: { marginTop: space.xs, marginBottom: space.sm },
+  recapBtn: { alignSelf: 'flex-start', marginTop: space.sm },
   section: { gap: space.sm },
   item: { flexDirection: 'row', alignItems: 'center', gap: space.md, paddingVertical: space.sm },
   bars: { flexDirection: 'row', justifyContent: 'space-between', gap: space.sm, height: 80, marginBottom: space.sm },

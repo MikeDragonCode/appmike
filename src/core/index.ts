@@ -6,6 +6,7 @@ export * from './day';
 export * from './slots';
 export * from './summary';
 export * from './maintenance';
+export * from './recap';
 export * from './habits';
 export * from './backup';
 export * from './catalog';

@@ -108,3 +108,16 @@ test('reminders explain themselves when notifications are unavailable', async ({
   await expect(page.getByText('Reminders work in the phone app.')).toBeVisible();
   await expect(page.getByRole('switch', { name: 'Close the day at the end of work' })).not.toBeChecked();
 });
+
+test('a weekly recap appears after a week of use and goes away once seen', async ({ page }) => {
+  await open(page);
+  await onboard(page);
+  await logDeepWork(page, 120);
+  await expect(page.getByText('Your week', { exact: true })).toHaveCount(0);
+  await page.clock.fastForward(7 * 24 * 60 * 60 * 1000 + 60 * 60 * 1000);
+  await page.clock.runFor(16_000); // let the clock on Today tick once
+  await expect(page.getByText('You worked 2h and rested 0m.')).toBeVisible();
+  await tap(page, 'Got it');
+  await page.clock.runFor(16_000);
+  await expect(page.getByText('Your week', { exact: true })).toHaveCount(0);
+});
