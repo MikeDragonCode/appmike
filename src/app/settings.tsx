@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, StyleSheet, Switch, View } from 'react-native';
+import { Linking, Platform, Pressable, StyleSheet, Switch, View } from 'react-native';
 
 import { PACE_OPTIONS, Profile, REST_PER_HOUR_MAX, REST_PER_HOUR_MIN, changeRestPerHour, shiftTime } from '@/core';
 import { cancelAllReminders, ensurePermission } from '@/services/notifications';
@@ -18,12 +18,21 @@ export default function Settings() {
   const router = useRouter();
   const { data } = useStore();
   const [confirmReset, setConfirmReset] = useState(false);
+  const [notifNote, setNotifNote] = useState<string | null>(null);
   if (!data) return null;
   const p = data.profile;
 
   const setProfile = (patch: Partial<Profile>) => updateData((d) => ({ ...d, profile: { ...d.profile, ...patch } }));
   const setReminder = async (key: 'remindClose' | 'remindWindDown' | 'remindBank', on: boolean) => {
-    if (on) await ensurePermission();
+    if (on && !(await ensurePermission())) {
+      setNotifNote(
+        Platform.OS === 'web'
+          ? 'Reminders work in the phone app.'
+          : 'Notifications are off for Shift to Life. Turn them on in your phone settings, then switch this on again.',
+      );
+      return;
+    }
+    setNotifNote(null);
     setProfile({ [key]: on });
   };
 
@@ -136,6 +145,16 @@ export default function Settings() {
         <ToggleRow label="Close the day at the end of work" value={p.remindClose} onChange={(v) => setReminder('remindClose', v)} />
         <ToggleRow label="Wind down before bed" value={p.remindWindDown} onChange={(v) => setReminder('remindWindDown', v)} />
         <ToggleRow label="Nudge when rest piles up" value={p.remindBank} onChange={(v) => setReminder('remindBank', v)} />
+        {notifNote ? (
+          <>
+            <AppText variant="small" color={colors.grind}>
+              {notifNote}
+            </AppText>
+            {Platform.OS !== 'web' ? (
+              <Button small kind="secondary" title="Open phone settings" onPress={() => Linking.openSettings()} />
+            ) : null}
+          </>
+        ) : null}
         <AppText variant="small">Reminders are created on your phone. Nothing is sent anywhere.</AppText>
       </Card>
 

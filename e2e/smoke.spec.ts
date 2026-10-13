@@ -99,3 +99,12 @@ test('Book rest stays reachable after the workday ends', async ({ page }) => {
   await expect(page.getByText('The workday is over.')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Book rest' })).toBeVisible();
 });
+
+test('reminders explain themselves when notifications are unavailable', async ({ page }) => {
+  await open(page);
+  await onboard(page);
+  await tap(page, 'Settings');
+  await page.getByRole('switch', { name: 'Close the day at the end of work' }).click();
+  await expect(page.getByText('Reminders work in the phone app.')).toBeVisible();
+  await expect(page.getByRole('switch', { name: 'Close the day at the end of work' })).not.toBeChecked();
+});
