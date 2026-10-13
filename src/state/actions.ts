@@ -8,6 +8,7 @@ import {
   finishSlot,
   logGrind,
   logRest,
+  rescheduleSlot,
   undoLog,
   startSlot,
   addMinutes,
@@ -27,8 +28,9 @@ export function newId(prefix: string): string {
   return `${prefix}_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
 }
 
-export const BOOK_ERRORS: Record<BookError | 'not_active', (shortBy?: number, bedtime?: string) => string> = {
+export const BOOK_ERRORS: Record<BookError | 'not_active' | 'not_planned', (shortBy?: number, bedtime?: string) => string> = {
   not_active: () => 'This rest is not running.',
+  not_planned: () => 'This rest can no longer be moved.',
   unknown_activity: () => 'That activity no longer exists.',
   not_rest_activity: () => 'Pick a timed rest activity.',
   too_short: () => 'Rest slots start at 5 minutes.',
@@ -131,4 +133,17 @@ export function undo(kind: 'work' | 'rest', habitId: string, amount: number): bo
   if (!next) return false;
   updateData(() => next);
   return true;
+}
+
+// Moves a booked slot to a new time and moves its start reminder with it.
+export async function moveSlot(slotId: string, startsAt: Date) {
+  const data = getState().data;
+  if (!data) return { ok: false as const, error: 'not_planned' as const };
+  const r = rescheduleSlot(data, slotId, startsAt, new Date());
+  if (!r.ok) return r;
+  updateData(() => r.data);
+  const habit = r.data.habits.find((h) => h.id === r.slot.habitId);
+  await cancelSlotNotifications(slotId);
+  if (habit && (await ensurePermission())) await scheduleSlotStart(r.slot, habit.name);
+  return r;
 }

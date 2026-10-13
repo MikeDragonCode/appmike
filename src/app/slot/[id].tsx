@@ -2,12 +2,13 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { COMPLETE_THRESHOLD, FinishOutcome } from '@/core';
-import { BOOK_ERRORS, beginSlot, endSlot, extendRunningSlot } from '@/state/actions';
+import { COMPLETE_THRESHOLD, FinishOutcome, addMinutes } from '@/core';
+import { BOOK_ERRORS, beginSlot, endSlot, extendRunningSlot, moveSlot } from '@/state/actions';
 import { useStore } from '@/state/store';
 import { useNow } from '@/hooks/useNow';
 import { colors, space } from '@/theme';
 import { Button } from '@/ui/Button';
+import { Stepper } from '@/ui/controls';
 import { Card } from '@/ui/Card';
 import { dayWord, fmtClock, fmtMins, fmtTimer } from '@/ui/format';
 import { success, tap } from '@/ui/haptics';
@@ -24,6 +25,7 @@ export default function SlotScreen() {
   const [busy, setBusy] = useState(false);
   const [confirmCancel, setConfirmCancel] = useState(false);
   const [extendNote, setExtendNote] = useState<string | null>(null);
+  const [moving, setMoving] = useState<Date | null>(null); // new start while the time is being changed
   const buzzed = useRef(false);
 
   const slot = data?.slots.find((s) => s.id === id);
@@ -92,6 +94,11 @@ export default function SlotScreen() {
       footer={
         slot.state === 'planned' ? (
           <>
+            {extendNote ? (
+              <AppText variant="small" color={colors.danger}>
+                {extendNote}
+              </AppText>
+            ) : null}
             <Button
               title="Start now"
               accent={colors.glow}
@@ -103,6 +110,24 @@ export default function SlotScreen() {
                 setBusy(false);
               }}
             />
+            {moving ? (
+              <Button
+                kind="secondary"
+                title="Move it here"
+                busy={busy}
+                onPress={async () => {
+                  setBusy(true);
+                  const r = await moveSlot(slot.id, moving);
+                  setBusy(false);
+                  if (r.ok) {
+                    setMoving(null);
+                    setExtendNote(null);
+                  } else setExtendNote(BOOK_ERRORS[r.error](r.shortBy, data.profile.bedtime));
+                }}
+              />
+            ) : (
+              <Button kind="secondary" title="Change time" onPress={() => setMoving(new Date(slot.startsAt))} />
+            )}
             <Button
               kind={confirmCancel ? 'danger' : 'ghost'}
               title={confirmCancel ? 'Tap again to cancel this slot' : 'Cancel this slot'}
@@ -162,6 +187,16 @@ export default function SlotScreen() {
             <AppText variant="small">
               {dayWord(startsAt, now)}, {slot.plannedMins} min. {fmtMins(slot.reservedCost)} of rest is held for it.
             </AppText>
+            {moving ? (
+              <View style={styles.moving}>
+                <Stepper
+                  label={dayWord(moving, now)}
+                  value={fmtClock(moving)}
+                  onMinus={() => setMoving(addMinutes(moving, -15))}
+                  onPlus={() => setMoving(addMinutes(moving, 15))}
+                />
+              </View>
+            ) : null}
           </>
         )}
       </View>
@@ -179,4 +214,5 @@ const styles = StyleSheet.create({
   center: { alignItems: 'center', gap: space.md, paddingVertical: space.xxl },
   timer: { fontSize: 56, fontVariant: ['tabular-nums'] },
   msg: { marginTop: space.sm },
+  moving: { alignSelf: 'stretch', marginTop: space.lg },
 });

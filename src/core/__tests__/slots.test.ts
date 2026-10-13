@@ -1,7 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  availableMins, bookSlot, doneSlotsLast7, finishSlot, glowCost, nextOpenSlot, reservedMins, skipSlot, startSlot,
+  availableMins, bookSlot, doneSlotsLast7, finishSlot, glowCost, nextOpenSlot, reservedMins, rescheduleSlot, skipSlot, startSlot,
 } from '../slots';
 import { Slot, UserData } from '../types';
 import { defaultProfile, doom, deepWork, makeData, ps5 } from './fixtures';
@@ -246,5 +246,52 @@ describe('doneSlotsLast7', () => {
 describe('deepWork stays a grind activity', () => {
   it('cannot be booked as rest', () => {
     assert.equal(deepWork.type, 'grind');
+  });
+});
+
+describe('rescheduleSlot', () => {
+  const rich = () => ({ ...makeData({ earnedTimeBank: 100 }) });
+  const planned = () => mustBook(rich(), { startsAt: at(20), plannedMins: 60 }).data;
+
+  it('moves a planned slot and keeps its id, length and reservation', () => {
+    const r = rescheduleSlot(planned(), 's1', at(21), NOW);
+    assert.ok(r.ok);
+    assert.equal(r.data.slots.length, 1);
+    assert.equal(r.data.slots[0].id, 's1');
+    assert.equal(r.data.slots[0].startsAt, at(21).toISOString());
+    assert.equal(r.data.slots[0].plannedMins, 60);
+    assert.equal(reservedMins(r.data), 60);
+  });
+
+  it('does not count its own reservation against the new time', () => {
+    const d = mustBook(makeData({ earnedTimeBank: 60 }), { startsAt: at(20), plannedMins: 60 }).data; // all 60 held, cap 30 spare
+    assert.ok(rescheduleSlot(d, 's1', at(21), NOW).ok);
+  });
+
+  it('re-prices when the new day is a rest day', () => {
+    const r = rescheduleSlot(planned(), 's1', at(19, 0, 17), NOW); // Saturday
+    assert.ok(r.ok);
+    assert.equal(r.data.slots[0].reservedCost, 30);
+  });
+
+  it('refuses a time that has passed or runs into bedtime, leaving the slot alone', () => {
+    const d = planned();
+    assert.deepEqual(rescheduleSlot(d, 's1', at(16), NOW), { ok: false, error: 'in_the_past' });
+    const strict = { ...d, profile: { ...d.profile, hardBedtime: true, bedtime: '23:00' } };
+    assert.deepEqual(rescheduleSlot(strict, 's1', at(22, 30), NOW), { ok: false, error: 'past_bedtime' });
+    assert.equal(strict.slots[0].startsAt, at(20).toISOString());
+  });
+
+  it('only works on a slot that is still planned', () => {
+    const d = startSlot(planned(), 's1', NOW);
+    assert.deepEqual(rescheduleSlot(d, 's1', at(21), NOW), { ok: false, error: 'not_planned' });
+    assert.deepEqual(rescheduleSlot(planned(), 'zzz', at(21), NOW), { ok: false, error: 'not_planned' });
+  });
+
+  it('does not mutate its input', () => {
+    const d = planned();
+    const copy = JSON.stringify(d);
+    rescheduleSlot(d, 's1', at(21), NOW);
+    assert.equal(JSON.stringify(d), copy);
   });
 });

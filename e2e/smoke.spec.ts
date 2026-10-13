@@ -192,3 +192,23 @@ test('history can add something that was forgotten', async ({ page }) => {
   await tap(page, 'Done');
   await expect(page.getByText('Today earned 53m, spent 0m.')).toBeVisible(); // 30 + 22.5, rounded
 });
+
+test('a booked slot can be moved to another time', async ({ page }) => {
+  await open(page);
+  await onboard(page);
+  await logDeepWork(page, 120);
+  await tap(page, 'Book rest');
+  await tap(page, '30 min');
+  await tap(page, 'In 1 hour');
+  await tap(page, 'Book it');
+  await tap(page, 'Next rest');
+  await expect(page.getByText('19:30', { exact: true })).toBeVisible();
+  await tap(page, 'Change time');
+  await page.getByLabel('Increase Today').click();
+  await page.getByLabel('Increase Today').click();
+  await tap(page, 'Move it here');
+  await expect(page.getByText('20:00', { exact: true }).first()).toBeVisible();
+  await expect(page.getByText('Move it here')).toHaveCount(0);
+  await tap(page, 'Close');
+  await expect(page.getByText('Today 20:00, 30 min')).toBeVisible();
+});

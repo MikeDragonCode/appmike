@@ -158,3 +158,21 @@ export function doneSlotsLast7(data: UserData, today: Date): number {
   from.setHours(0, 0, 0, 0);
   return data.slots.filter((s) => s.state === 'done' && s.finishedAt && new Date(s.finishedAt) >= from).length;
 }
+
+export type RescheduleResult = { ok: true; data: UserData; slot: Slot } | { ok: false; error: BookError | 'not_planned'; shortBy?: number };
+
+// Moves a booked slot that has not started to a new time. The slot is checked as if it
+// were booked fresh (past time, bedtime, cost on the new day), and on any problem
+// the original slot stays exactly as it was.
+export function rescheduleSlot(data: UserData, slotId: string, startsAt: Date, now: Date): RescheduleResult {
+  const slot = data.slots.find((s) => s.id === slotId);
+  if (!slot || slot.state !== 'planned') return { ok: false, error: 'not_planned' };
+  const without: UserData = { ...data, slots: data.slots.filter((s) => s.id !== slotId) };
+  const r = bookSlot(without, { id: slot.id, habitId: slot.habitId, plannedMins: slot.plannedMins, startsAt, now });
+  if (!r.ok) return r;
+  return {
+    ok: true,
+    slot: r.slot,
+    data: { ...data, slots: data.slots.map((s) => (s.id === slotId ? r.slot : s)) },
+  };
+}
