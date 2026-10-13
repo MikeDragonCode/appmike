@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSyncExternalStore } from 'react';
-import { UserData } from '@/core';
+import { UserData, isUserData } from '@/core';
 
 // A running focus (work) session. Stored with its start time so it survives
 // the app being closed.
@@ -26,21 +26,6 @@ function emit(next: State) {
   listeners.forEach((l) => l());
 }
 
-function isUserData(v: unknown): v is UserData {
-  const d = v as UserData | null;
-  return Boolean(
-    d &&
-      typeof d === 'object' &&
-      Array.isArray(d.habits) &&
-      Array.isArray(d.logs) &&
-      Array.isArray(d.slots) &&
-      Array.isArray(d.restDays) &&
-      typeof d.earnedTimeBank === 'number' &&
-      d.profile &&
-      typeof d.profile === 'object',
-  );
-}
-
 // Writes are chained so two quick updates cannot land out of order.
 let writeChain: Promise<unknown> = Promise.resolve();
 function persist(key: string, value: unknown | null) {
@@ -56,6 +41,8 @@ export async function loadStore(): Promise<void> {
     const raw = await AsyncStorage.getItem(DATA_KEY);
     const parsed = raw ? JSON.parse(raw) : null;
     if (isUserData(parsed)) data = parsed;
+    // Never throw away what we cannot read: keep it aside so it can be recovered.
+    else if (raw) await AsyncStorage.setItem(`${DATA_KEY}.unreadable`, raw);
   } catch {
     data = null;
   }

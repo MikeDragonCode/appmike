@@ -7,5 +7,6 @@ export * from './slots';
 export * from './summary';
 export * from './maintenance';
 export * from './habits';
+export * from './backup';
 export * from './catalog';
 export * from './plan';

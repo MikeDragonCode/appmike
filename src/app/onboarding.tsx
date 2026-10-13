@@ -30,6 +30,7 @@ import { Card } from '@/ui/Card';
 import { Chip, Row, Stepper } from '@/ui/controls';
 import { fmtMins } from '@/ui/format';
 import { tap } from '@/ui/haptics';
+import { RestoreForm } from '@/ui/RestoreForm';
 import { Screen } from '@/ui/Screen';
 import { AppText } from '@/ui/Text';
 
@@ -53,6 +54,7 @@ export default function Onboarding() {
   const [customGlow, setCustomGlow] = useState<CustomActivity[]>([]);
   const [restPerHour, setRestPerHour] = useState(30);
   const [busy, setBusy] = useState(false);
+  const [restoring, setRestoring] = useState(false);
 
   const selection: Selection = { grindIds, glowIds, customGrind, customGlow };
   const answers = { struggles, paceHours, workEnd, bedtime, restPerHour, restDays };
@@ -80,7 +82,9 @@ export default function Onboarding() {
     else setStep(step + 1);
   };
 
-  const footer = (
+  const footer = restoring ? (
+    <Button kind="ghost" title="Back" onPress={() => setRestoring(false)} />
+  ) : (
     <>
       <Button
         title={step === 0 ? 'Begin' : step === STEPS - 1 ? 'Start' : 'Continue'}
@@ -96,7 +100,15 @@ export default function Onboarding() {
     <Screen footer={footer}>
       {step > 0 ? <Dots current={step} /> : null}
 
-      {step === 0 ? (
+      {restoring ? (
+        <View style={styles.block}>
+          <AppText variant="title">Restore a backup</AppText>
+          <AppText variant="small">Paste the backup text you saved from Settings.</AppText>
+          <RestoreForm confirm={false} />
+        </View>
+      ) : null}
+
+      {!restoring && step === 0 ? (
         <View style={styles.block}>
           <AppText variant="display">Shift to Life</AppText>
           <AppText variant="heading" color={colors.muted}>
@@ -109,10 +121,11 @@ export default function Onboarding() {
           <AppText variant="small">
             Shift to Life is a planning tool. It is not therapy and not medical advice.
           </AppText>
+          <Button kind="ghost" title="I have a backup" onPress={() => setRestoring(true)} />
         </View>
       ) : null}
 
-      {step === 1 ? (
+      {!restoring && step === 1 ? (
         <View style={styles.block}>
           <AppText variant="title">What is hardest right now?</AppText>
           <AppText variant="small">Pick up to {MAX_STRUGGLES}. This sets your starting rules. You can change anything later.</AppText>
@@ -135,7 +148,7 @@ export default function Onboarding() {
         </View>
       ) : null}
 
-      {step === 2 ? (
+      {!restoring && step === 2 ? (
         <View style={styles.block}>
           <AppText variant="title">Your rhythm</AppText>
           <AppText variant="label">A typical working day</AppText>
@@ -167,7 +180,7 @@ export default function Onboarding() {
         </View>
       ) : null}
 
-      {step === 3 ? (
+      {!restoring && step === 3 ? (
         <View style={styles.block}>
           <AppText variant="title">What counts as work?</AppText>
           <AppText variant="small">Choose at least {MIN_ACTIVITIES}. Anything that takes effort and moves your life forward.</AppText>
@@ -196,7 +209,7 @@ export default function Onboarding() {
         </View>
       ) : null}
 
-      {step === 4 ? (
+      {!restoring && step === 4 ? (
         <View style={styles.block}>
           <AppText variant="title">How do you like to rest?</AppText>
           <AppText variant="small">Choose at least {MIN_ACTIVITIES}. Be honest, nothing here is judged.</AppText>
@@ -225,7 +238,7 @@ export default function Onboarding() {
         </View>
       ) : null}
 
-      {step === 5 ? (
+      {!restoring && step === 5 ? (
         <View style={styles.block}>
           <AppText variant="title">How generous is the trade?</AppText>
           {REST_PRESETS.map((p) => (
@@ -249,7 +262,7 @@ export default function Onboarding() {
         </View>
       ) : null}
 
-      {step === 6 ? (
+      {!restoring && step === 6 ? (
         <View style={styles.block}>
           <AppText variant="title">Your starting plan</AppText>
           {plan.map((line) => (

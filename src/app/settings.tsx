@@ -139,6 +139,14 @@ export default function Settings() {
         <AppText variant="small">Reminders are created on your phone. Nothing is sent anywhere.</AppText>
       </Card>
 
+      <AppText variant="label">Your data</AppText>
+      <Card style={styles.group}>
+        <AppText variant="small">
+          Data lives only on this phone. If you change phones or reinstall, you will lose it unless you keep a backup.
+        </AppText>
+        <Button kind="secondary" title="Backup and restore" onPress={() => router.push('/backup')} />
+      </Card>
+
       <AppText variant="label">About</AppText>
       <Card style={styles.group}>
         <AppText variant="small">
