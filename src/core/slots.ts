@@ -48,6 +48,53 @@ export type BookResult =
   | { ok: true; data: UserData; slot: Slot }
   | { ok: false; error: BookError; shortBy?: number };
 
+// True when the bedtime rule is on and the slot starts or ends inside the quiet window.
+// A slot may end exactly at bedtime, so its last minute is the one tested.
+export function breaksBedtime(profile: UserData['profile'], startsAt: Date, mins: number): boolean {
+  if (!profile.hardBedtime) return false;
+  const bed = parseHM(profile.bedtime);
+  const lastMinute = addMinutes(addMinutes(startsAt, mins), -1);
+  return inQuietWindow(minutesOfDay(startsAt), bed) || inQuietWindow(minutesOfDay(lastMinute), bed);
+}
+
+export interface BedtimeFixes {
+  earlier?: Date; // the nearest start before this one that fits, not in the past
+  later?: Date; // the nearest start after this one that fits
+  shorter?: number; // the longest length that still fits from this start
+}
+
+const GRID_MINS = 5;
+
+// Ways out when a slot would run into the quiet window. Everything offered is checked
+// with the same rule bookSlot uses, so a suggestion can always be booked (cost aside).
+export function bedtimeFixes(data: UserData, startsAt: Date, mins: number, now: Date): BedtimeFixes {
+  const out: BedtimeFixes = {};
+  if (!breaksBedtime(data.profile, startsAt, mins)) return out;
+  const floor = now.getTime() - 60_000;
+  for (let i = 1; i <= (12 * 60) / GRID_MINS; i++) {
+    const t = addMinutes(startsAt, -i * GRID_MINS);
+    if (t.getTime() < floor) break;
+    if (!breaksBedtime(data.profile, t, mins)) {
+      out.earlier = t;
+      break;
+    }
+  }
+  for (let i = 1; i <= (24 * 60) / GRID_MINS; i++) {
+    const t = addMinutes(startsAt, i * GRID_MINS);
+    if (!breaksBedtime(data.profile, t, mins)) {
+      out.later = t;
+      break;
+    }
+  }
+  for (let m = mins - GRID_MINS; m >= MIN_SLOT_MINS; m -= GRID_MINS) {
+    if (!breaksBedtime(data.profile, startsAt, m)) {
+      out.shorter = m;
+      break;
+    }
+  }
+  return out;
+}
+
 export function bookSlot(data: UserData, input: BookInput): BookResult {
   const habit = data.habits.find((h) => h.id === input.habitId);
   if (!habit) return { ok: false, error: 'unknown_activity' };
@@ -56,15 +103,7 @@ export function bookSlot(data: UserData, input: BookInput): BookResult {
   // "Now" is allowed: a minute of slack for the time it takes to tap confirm.
   if (input.startsAt.getTime() < input.now.getTime() - 60_000) return { ok: false, error: 'in_the_past' };
 
-  const end = addMinutes(input.startsAt, input.plannedMins);
-  if (data.profile.hardBedtime) {
-    const bed = parseHM(data.profile.bedtime);
-    // A slot may end exactly at bedtime, so test its last minute.
-    const lastMinute = addMinutes(end, -1);
-    if (inQuietWindow(minutesOfDay(input.startsAt), bed) || inQuietWindow(minutesOfDay(lastMinute), bed)) {
-      return { ok: false, error: 'past_bedtime' };
-    }
-  }
+  if (breaksBedtime(data.profile, input.startsAt, input.plannedMins)) return { ok: false, error: 'past_bedtime' };
 
   const cost = glowCost(habit, input.plannedMins, isRestDay(data, input.startsAt));
   const room = availableMins(data) + data.profile.advanceCapMins;

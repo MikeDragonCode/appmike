@@ -1,7 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  availableMins, bookSlot, doneSlotsLast7, finishSlot, glowCost, nextOpenSlot, reservedMins, rescheduleSlot, skipSlot, startSlot,
+  availableMins, bookSlot, doneSlotsLast7, finishSlot, glowCost, nextOpenSlot, reservedMins, rescheduleSlot, skipSlot, startSlot, bedtimeFixes,
 } from '../slots';
 import { Slot, UserData } from '../types';
 import { defaultProfile, doom, deepWork, makeData, ps5 } from './fixtures';
@@ -293,5 +293,52 @@ describe('rescheduleSlot', () => {
     const copy = JSON.stringify(d);
     rescheduleSlot(d, 's1', at(21), NOW);
     assert.equal(JSON.stringify(d), copy);
+  });
+});
+
+describe('bedtimeFixes', () => {
+  const strict = (bed = '23:00') => makeData({ earnedTimeBank: 200, profile: { ...defaultProfile, hardBedtime: true, bedtime: bed } });
+  const n = at(18);
+
+  it('offers nothing when the slot already fits or the rule is off', () => {
+    assert.deepEqual(bedtimeFixes(strict(), at(21), 60, n), {});
+    assert.deepEqual(bedtimeFixes(makeData(), at(22, 30), 60, n), {});
+  });
+
+  it('suggests an earlier start, a later one and a shorter slot for a slot that runs late', () => {
+    const f = bedtimeFixes(strict(), at(22, 30), 60, n); // would end 23:30
+    assert.deepEqual(f.earlier, at(22, 0)); // 22:00-23:00 ends exactly at bedtime
+    assert.deepEqual(f.later, at(5, 0, 14)); // quiet until 05:00
+    assert.equal(f.shorter, 30);
+  });
+
+  it('has no earlier start when it would be in the past', () => {
+    const f = bedtimeFixes(strict(), at(22, 30), 60, at(22, 20));
+    assert.equal(f.earlier, undefined);
+  });
+
+  it('for a start inside the quiet window, there is no shorter fix', () => {
+    const f = bedtimeFixes(strict(), at(23, 30), 30, n);
+    assert.equal(f.shorter, undefined);
+    assert.deepEqual(f.later, at(5, 0, 14));
+    assert.deepEqual(f.earlier, at(22, 30));
+  });
+
+  it('every suggestion is accepted by bookSlot', () => {
+    const d = strict();
+    for (const [h, m, mins] of [[22, 30, 60], [23, 15, 45], [22, 55, 30], [21, 45, 90]] as const) {
+      const f = bedtimeFixes(d, at(h, m), mins, n);
+      for (const t of [f.earlier, f.later]) {
+        if (t) assert.ok(bookSlot(d, { id: 'x', habitId: 'gl1', plannedMins: mins, startsAt: t, now: n }).ok, `${h}:${m} ${mins} -> ${t}`);
+      }
+      if (f.shorter) assert.ok(bookSlot(d, { id: 'x', habitId: 'gl1', plannedMins: f.shorter, startsAt: at(h, m), now: n }).ok);
+    }
+  });
+
+  it('works for a bedtime after midnight', () => {
+    const d = strict('01:00');
+    const f = bedtimeFixes(d, at(0, 30, 14), 60, at(23, 50)); // 00:30-01:30 on the 14th
+    assert.deepEqual(f.earlier, at(0, 0, 14));
+    assert.deepEqual(f.later, at(5, 0, 14));
   });
 });

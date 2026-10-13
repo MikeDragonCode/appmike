@@ -212,3 +212,16 @@ test('a booked slot can be moved to another time', async ({ page }) => {
   await tap(page, 'Close');
   await expect(page.getByText('Today 20:00, 30 min')).toBeVisible();
 });
+
+test('when rest would run past bedtime, the app offers ways to make it fit', async ({ page }) => {
+  await open(page, new Date(2026, 9, 13, 22, 30));
+  await onboard(page, ['Not enough sleep']);
+  await logDeepWork(page, 120);
+  await tap(page, 'Book rest');
+  await expect(page.getByText('Your bedtime rule: rest has to end by 23:00.')).toBeVisible();
+  await expect(page.getByText('Fits your bedtime')).toBeVisible();
+  await tap(page, 'Shorten to 30 min');
+  await expect(page.getByText('Your bedtime rule: rest has to end by 23:00.')).toHaveCount(0);
+  await tap(page, 'Start now');
+  await expect(page.getByText('Resting', { exact: true })).toBeVisible();
+});

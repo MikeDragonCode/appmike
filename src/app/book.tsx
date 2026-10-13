@@ -2,7 +2,7 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { MIN_SLOT_MINS, activeHabits, addMinutes, availableMins, bookSlot, glowCost, isRestDay } from '@/core';
+import { MIN_SLOT_MINS, activeHabits, addMinutes, availableMins, bedtimeFixes, bookSlot, glowCost, isRestDay } from '@/core';
 import { BOOK_ERRORS, book } from '@/state/actions';
 import { useStore } from '@/state/store';
 import { useNow } from '@/hooks/useNow';
@@ -46,6 +46,7 @@ export default function BookRest() {
   const left = avail - cost;
   const end = addMinutes(start, mins);
 
+  const fixes = !preview.ok && preview.error === 'past_bedtime' ? bedtimeFixes(data, start, mins, now) : null;
   const problem = preview.ok
     ? null
     : BOOK_ERRORS[preview.error](preview.ok ? undefined : preview.shortBy, data.profile.bedtime);
@@ -144,6 +145,28 @@ export default function BookRest() {
         onPlus={() => setStartsAt(addMinutes(startsAt ?? nextQuarter(now), 15))}
       />
 
+      {fixes && (fixes.earlier || fixes.shorter || fixes.later) ? (
+        <View style={styles.fixes}>
+          <AppText variant="label">Fits your bedtime</AppText>
+          <Row>
+            {fixes.shorter ? (
+              <Chip label={`Shorten to ${fixes.shorter} min`} selected={false} tint={colors.glow} onPress={() => setMins(fixes.shorter as number)} />
+            ) : null}
+            {fixes.earlier ? (
+              <Chip label={`Start at ${fmtClock(fixes.earlier)}`} selected={false} tint={colors.glow} onPress={() => setStartsAt(fixes.earlier as Date)} />
+            ) : null}
+            {fixes.later ? (
+              <Chip
+                label={`${dayWord(fixes.later, now)} ${fmtClock(fixes.later)}`}
+                selected={false}
+                tint={colors.glow}
+                onPress={() => setStartsAt(fixes.later as Date)}
+              />
+            ) : null}
+          </Row>
+        </View>
+      ) : null}
+
       <Card>
         <View style={styles.sum}>
           <AppText variant="small">Slot</AppText>
@@ -172,5 +195,6 @@ export default function BookRest() {
 }
 
 const styles = StyleSheet.create({
+  fixes: { gap: space.sm },
   sum: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: space.xs },
 });
