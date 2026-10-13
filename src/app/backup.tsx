@@ -2,7 +2,7 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, Share, StyleSheet, TextInput, View } from 'react-native';
 
-import { serializeBackup } from '@/core';
+import { serializeBackup, toCsv } from '@/core';
 import { useStore } from '@/state/store';
 import { colors, radius, space } from '@/theme';
 import { Button } from '@/ui/Button';
@@ -25,6 +25,15 @@ export default function Backup() {
       setShareNote(null);
     } catch {
       setShareNote('Sharing is not available here. Copy the text below instead.');
+    }
+  }
+
+  async function shareCsv() {
+    try {
+      await Share.share({ message: toCsv(data!), title: 'Shift to Life export.csv' });
+      setShareNote(null);
+    } catch {
+      setShareNote('Sharing is not available here.');
     }
   }
 
@@ -60,6 +69,15 @@ export default function Backup() {
           style={[styles.input, styles.readonly]}
           accessibilityLabel="Backup text"
         />
+      </Card>
+
+      <AppText variant="label">Spreadsheet</AppText>
+      <Card style={styles.group}>
+        <AppText variant="small">
+          One row per activity per day, as CSV text. Paste it into a spreadsheet to look at your own numbers. This is
+          not a backup, it cannot be restored.
+        </AppText>
+        <Button kind="secondary" title="Share as CSV" onPress={shareCsv} />
       </Card>
 
       <AppText variant="label">Restore</AppText>
