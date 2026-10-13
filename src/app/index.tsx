@@ -23,6 +23,7 @@ import {
   todayHint,
   weeklyRecap,
 } from '@/core';
+import { undo } from '@/state/actions';
 import { updateData, useStore } from '@/state/store';
 import { useNow } from '@/hooks/useNow';
 import { colors, radius, space } from '@/theme';
@@ -38,7 +39,7 @@ export default function Today() {
   const router = useRouter();
   const { data, focus } = useStore();
   const now = useNow(15_000);
-  const [toast, setToast] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ text: string; habitId: string } | null>(null);
   if (!data) return null;
 
   const avail = availableMins(data);
@@ -66,8 +67,8 @@ export default function Today() {
     if (!r) return;
     updateData(() => r.data);
     success();
-    setToast(`+${Math.round(r.earned)} min of rest`);
-    setTimeout(() => setToast(null), 2500);
+    setToast({ text: `+${Math.round(r.earned)} min of rest`, habitId: h.id });
+    setTimeout(() => setToast((t) => (t?.habitId === h.id ? null : t)), 6000);
   }
 
   return (
@@ -112,6 +113,7 @@ export default function Today() {
         ) : (
           <Button title="Book rest" accent={colors.glow} onPress={() => router.push('/book')} />
         )}
+        <Button small kind="ghost" title="Log rest I already took" onPress={() => router.push('/log-rest')} />
       </Card>
 
       {checkin ? (
@@ -210,9 +212,23 @@ export default function Today() {
           })}
         </Card>
         {toast ? (
-          <AppText variant="small" color={colors.good}>
-            {toast}
-          </AppText>
+          <View style={styles.toast}>
+            <AppText variant="small" color={colors.good}>
+              {toast.text}
+            </AppText>
+            <Pressable
+              accessibilityRole="button"
+              hitSlop={12}
+              onPress={() => {
+                undo('work', toast.habitId, 1);
+                setToast(null);
+              }}
+            >
+              <AppText variant="small" color={colors.text}>
+                Undo
+              </AppText>
+            </Pressable>
+          </View>
         ) : null}
       </View>
 
@@ -250,6 +266,7 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   bank: { gap: space.sm, padding: space.xl },
   hint: { marginTop: space.xs, marginBottom: space.sm },
+  toast: { flexDirection: 'row', alignItems: 'center', gap: space.lg },
   recapBtn: { alignSelf: 'flex-start', marginTop: space.sm },
   section: { gap: space.sm },
   item: { flexDirection: 'row', alignItems: 'center', gap: space.md, paddingVertical: space.sm },

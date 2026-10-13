@@ -3,7 +3,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { logWork, startFocus } from '@/state/actions';
+import { logWork, startFocus, undo } from '@/state/actions';
 import { setFocus, useStore } from '@/state/store';
 import { useNow } from '@/hooks/useNow';
 import { colors, space } from '@/theme';
@@ -56,7 +56,19 @@ export default function Focus() {
     return (
       <Screen
         padTop={false}
-        footer={<Button title="Done" onPress={() => router.back()} />}
+        footer={
+          <>
+            <Button title="Done" onPress={() => router.back()} />
+            <Button
+              kind="ghost"
+              title="Undo this entry"
+              onPress={() => {
+                undo('work', habit.id, result.minutes);
+                router.back();
+              }}
+            />
+          </>
+        }
       >
         <ModalHeader title="Nice work" onClose={() => router.back()} />
         <Card>

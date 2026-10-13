@@ -121,3 +121,50 @@ test('a weekly recap appears after a week of use and goes away once seen', async
   await page.clock.runFor(16_000);
   await expect(page.getByText('Your week', { exact: true })).toHaveCount(0);
 });
+
+test('rest taken without booking can be logged, and undone', async ({ page }) => {
+  await open(page);
+  await onboard(page);
+  await logDeepWork(page, 120); // 60 saved
+  await tap(page, 'Log rest I already took');
+  await page.getByRole('button', { name: 'Log rest' }).click();
+  await expect(page.getByText('20m came out of your bank.')).toBeVisible();
+  await tap(page, 'Undo this entry');
+  await expect(page.getByText('You have 60 min of rest saved.')).toBeVisible();
+  await tap(page, 'Log rest I already took');
+  await page.getByRole('button', { name: 'Log rest' }).click();
+  await tap(page, 'Done');
+  await expect(page.getByText('Today earned 1h, spent 20m.')).toBeVisible();
+});
+
+test('a counter tap can be undone right away', async ({ page }) => {
+  await open(page);
+  await tap(page, 'Begin');
+  await tap(page, 'Continue');
+  await tap(page, 'Continue');
+  await tap(page, '🍳 Cook / Chores');
+  for (let i = 0; i < 3; i++) await tap(page, 'Continue');
+  await tap(page, 'Start');
+  await tap(page, '+1');
+  await expect(page.getByText('+15 min of rest')).toBeVisible();
+  await expect(page.getByText('You have 15 min of rest saved.')).toBeHidden();
+  await tap(page, 'Undo');
+  await expect(page.getByText('+15 min of rest')).toBeHidden();
+  await expect(page.getByText('Start with one focus block.')).toBeVisible();
+});
+
+test('a running slot can be extended', async ({ page }) => {
+  await open(page);
+  await onboard(page);
+  await logDeepWork(page, 180); // 90 saved
+  await tap(page, 'Book rest');
+  await tap(page, '30 min');
+  await tap(page, 'Start now');
+  await expect(page.getByText('30 min slot,')).toBeVisible();
+  await tap(page, 'Add 15 min');
+  await expect(page.getByText('45 min slot,')).toBeVisible();
+  await page.clock.fastForward('00:46:00');
+  await expect(page.getByText('Time is up')).toBeVisible();
+  await tap(page, 'Finish');
+  await expect(page.getByText('Rest taken: 45 min. Well spent.')).toBeVisible();
+});

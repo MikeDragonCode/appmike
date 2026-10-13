@@ -111,6 +111,7 @@ export default function RootLayout() {
             <Stack.Screen name="backup" />
             <Stack.Screen name="book" options={{ presentation: 'modal' }} />
             <Stack.Screen name="close-day" options={{ presentation: 'modal' }} />
+            <Stack.Screen name="log-rest" options={{ presentation: 'modal' }} />
             <Stack.Screen name="checkin" options={{ presentation: 'modal' }} />
             <Stack.Screen name="focus" options={{ presentation: 'modal', gestureEnabled: false }} />
             <Stack.Screen name="slot/[id]" options={{ presentation: 'modal' }} />

@@ -2,9 +2,13 @@ import {
   BookError,
   FinishOutcome,
   Slot,
+  ExtendResult,
   bookSlot,
+  extendSlot,
   finishSlot,
   logGrind,
+  logRest,
+  undoLog,
   startSlot,
   addMinutes,
 } from '@/core';
@@ -23,7 +27,8 @@ export function newId(prefix: string): string {
   return `${prefix}_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
 }
 
-export const BOOK_ERRORS: Record<BookError, (shortBy?: number, bedtime?: string) => string> = {
+export const BOOK_ERRORS: Record<BookError | 'not_active', (shortBy?: number, bedtime?: string) => string> = {
+  not_active: () => 'This rest is not running.',
   unknown_activity: () => 'That activity no longer exists.',
   not_rest_activity: () => 'Pick a timed rest activity.',
   too_short: () => 'Rest slots start at 5 minutes.',
@@ -91,4 +96,39 @@ export function logWork(habitId: string, minutes: number): number | null {
   if (!r) return null;
   updateData(() => r.data);
   return r.earned;
+}
+
+// Adds time to a running rest slot and moves its end reminder.
+export async function extendRunningSlot(slotId: string, extraMins: number): Promise<ExtendResult> {
+  const data = getState().data;
+  if (!data) return { ok: false, error: 'not_active' };
+  const r = extendSlot(data, slotId, extraMins);
+  if (!r.ok) return r;
+  updateData(() => r.data);
+  const slot = r.data.slots.find((x) => x.id === slotId);
+  const habit = slot && r.data.habits.find((h) => h.id === slot.habitId);
+  if (slot?.startedAt && habit && (await ensurePermission())) {
+    await scheduleSlotEnd(slot, habit.name, addMinutes(new Date(slot.startedAt), slot.plannedMins));
+  }
+  return r;
+}
+
+// Logs rest that already happened. Returns the bank minutes it cost, or null.
+export function logRestNow(habitId: string, minutes: number): number | null {
+  const data = getState().data;
+  if (!data) return null;
+  const r = logRest(data, habitId, minutes, new Date());
+  if (!r) return null;
+  updateData(() => r.data);
+  return r.charged;
+}
+
+// Takes back a log entry made today. Returns false if it is no longer there.
+export function undo(kind: 'work' | 'rest', habitId: string, amount: number): boolean {
+  const data = getState().data;
+  if (!data) return false;
+  const next = undoLog(data, kind, habitId, amount, new Date());
+  if (!next) return false;
+  updateData(() => next);
+  return true;
 }

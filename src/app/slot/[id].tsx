@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { COMPLETE_THRESHOLD, FinishOutcome } from '@/core';
-import { beginSlot, endSlot } from '@/state/actions';
+import { BOOK_ERRORS, beginSlot, endSlot, extendRunningSlot } from '@/state/actions';
 import { useStore } from '@/state/store';
 import { useNow } from '@/hooks/useNow';
 import { colors, space } from '@/theme';
@@ -23,6 +23,7 @@ export default function SlotScreen() {
   const [outcome, setOutcome] = useState<FinishOutcome | null>(null);
   const [busy, setBusy] = useState(false);
   const [confirmCancel, setConfirmCancel] = useState(false);
+  const [extendNote, setExtendNote] = useState<string | null>(null);
   const buzzed = useRef(false);
 
   const slot = data?.slots.find((s) => s.id === id);
@@ -37,6 +38,7 @@ export default function SlotScreen() {
       buzzed.current = true;
       success();
     }
+    if (!over) buzzed.current = false;
   }, [over]);
 
   if (!data || !slot || !habit) {
@@ -108,12 +110,28 @@ export default function SlotScreen() {
             />
           </>
         ) : (
-          <Button
-            title={over ? 'Finish' : 'Finish early'}
-            accent={colors.glow}
-            busy={busy}
-            onPress={() => finish(over ? slot.plannedMins : minsUsed)}
-          />
+          <>
+            {extendNote ? (
+              <AppText variant="small" color={colors.danger}>
+                {extendNote}
+              </AppText>
+            ) : null}
+            <Button
+              title={over ? 'Finish' : 'Finish early'}
+              accent={colors.glow}
+              busy={busy}
+              onPress={() => finish(over ? slot.plannedMins : minsUsed)}
+            />
+            <Button
+              kind="secondary"
+              title="Add 15 min"
+              onPress={async () => {
+                tap();
+                const r = await extendRunningSlot(slot.id, 15);
+                setExtendNote(r.ok ? null : BOOK_ERRORS[r.error](r.shortBy, data.profile.bedtime));
+              }}
+            />
+          </>
         )
       }
     >
@@ -128,7 +146,7 @@ export default function SlotScreen() {
               {over ? 'Time is up' : fmtTimer((plannedMs - elapsedMs) / 1000)}
             </AppText>
             <AppText variant="small">
-              {over ? 'You can keep going, but this slot is full.' : `${slot.plannedMins} min slot, ${fmtMins(minsUsed)} used`}
+              {over ? 'This slot is full. Finish it, or add time.' : `${slot.plannedMins} min slot, ${fmtMins(minsUsed)} used`}
             </AppText>
             {earlyNote ? (
               <AppText variant="small" center>
