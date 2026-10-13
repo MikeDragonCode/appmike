@@ -1,7 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { materializeHabits, DEFAULT_GLOW_IDS, DEFAULT_GRIND_IDS } from '../catalog';
-import { Answers, buildProfile, changeRestPerHour, createInitialData, describePlan, selectionIsValid, shiftTime } from '../plan';
+import { Answers, buildProfile, changeRestPerHour, completeCheckin, createInitialData, describePlan, dueCheckin, selectionIsValid, shiftTime } from '../plan';
 import { Struggle } from '../types';
 
 const answers = (struggles: Struggle[] = [], over: Partial<Answers> = {}): Answers => ({
@@ -161,5 +161,66 @@ describe('changeRestPerHour', () => {
     const copy = JSON.stringify(base);
     changeRestPerHour(base, 45);
     assert.equal(JSON.stringify(base), copy);
+  });
+});
+
+describe('check-ins', () => {
+  const created = new Date(2026, 9, 1, 9, 0);
+  const base = createInitialData(
+    {
+      answers: { struggles: ['overwork'], paceHours: 8, workEnd: '18:00', bedtime: '23:00', restPerHour: 30, restDays: [0, 6] },
+      selection: { grindIds: ['g1', 'g2'], glowIds: ['gl1', 'gl2'], customGrind: [], customGlow: [] },
+    },
+    created,
+  );
+  const day = (n: number) => new Date(2026, 9, 1 + n, 20, 0);
+
+  it('is not due before day 3', () => {
+    assert.equal(dueCheckin(base, day(0)), null);
+    assert.equal(dueCheckin(base, day(2)), null);
+  });
+
+  it('becomes due on day 3, 7 and 14', () => {
+    assert.equal(dueCheckin(base, day(3)), 3);
+    assert.equal(dueCheckin(base, day(7)), 7);
+    assert.equal(dueCheckin(base, day(14)), 14);
+    assert.equal(dueCheckin(base, day(40)), 14);
+  });
+
+  it('folds missed stages into the latest one', () => {
+    const answered = completeCheckin(base, 14);
+    assert.deepEqual(answered.checkinsDone, [3, 7, 14]);
+    assert.equal(dueCheckin(answered, day(20)), null);
+  });
+
+  it('stays quiet once the stage is handled, then asks again at the next', () => {
+    const d3 = completeCheckin(base, 3);
+    assert.equal(dueCheckin(d3, day(5)), null);
+    assert.equal(dueCheckin(d3, day(7)), 7);
+  });
+
+  it('keeps the plan when no struggles are passed', () => {
+    const r = completeCheckin(base, 3);
+    assert.deepEqual(r.profile, base.profile);
+  });
+
+  it('applyStruggles changes only the rules tied to struggles', () => {
+    const tweaked = { ...base, profile: { ...base.profile, workEnd: '17:30', restPerHour: 20, remindBank: false } };
+    const r = completeCheckin(tweaked, 7, ['sleep', 'no_energy']).profile;
+    assert.deepEqual(r.struggles, ['sleep', 'no_energy']);
+    assert.equal(r.hardBedtime, true);
+    assert.equal(r.remindWindDown, true);
+    assert.equal(r.remindClose, false);
+    assert.equal(r.advanceCapMins, 60);
+    assert.equal(r.defaultSlotMins, 30);
+    assert.equal(r.workEnd, '17:30');
+    assert.equal(r.restPerHour, 20);
+    assert.equal(r.remindBank, false);
+  });
+
+  it('works when no stage was ever recorded (older data)', () => {
+    const legacy = { ...base };
+    delete legacy.checkinsDone;
+    assert.equal(dueCheckin(legacy, day(4)), 3);
   });
 });

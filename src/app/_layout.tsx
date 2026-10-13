@@ -3,11 +3,12 @@ import { DarkTheme, Stack, ThemeProvider, useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useRef } from 'react';
-import { Platform } from 'react-native';
+import { AppState, Platform } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { setupNotifications, syncBankNudge, syncRoutineReminders } from '@/services/notifications';
-import { loadStore, useStore } from '@/state/store';
+import { expireSlots } from '@/core';
+import { cancelSlotNotifications, setupNotifications, syncBankNudge, syncRoutineReminders } from '@/services/notifications';
+import { getState, loadStore, setData, useStore } from '@/state/store';
 import { colors } from '@/theme';
 
 SplashScreen.preventAutoHideAsync().catch(() => undefined);
@@ -55,6 +56,30 @@ function RemindersSync() {
   return null;
 }
 
+// Closes rest slots the user walked away from, so reserved rest never stays stuck.
+function Housekeeping() {
+  useEffect(() => {
+    const run = () => {
+      const d = getState().data;
+      if (!d) return;
+      const r = expireSlots(d, new Date());
+      if (r.data === d) return;
+      setData(r.data);
+      r.expired.forEach((slot) => cancelSlotNotifications(slot.id));
+    };
+    run();
+    const sub = AppState.addEventListener('change', (st) => {
+      if (st === 'active') run();
+    });
+    const timer = setInterval(run, 60_000);
+    return () => {
+      sub.remove();
+      clearInterval(timer);
+    };
+  }, []);
+  return null;
+}
+
 export default function RootLayout() {
   const { ready, data } = useStore();
 
@@ -74,6 +99,7 @@ export default function RootLayout() {
         <StatusBar style="light" />
         {Platform.OS !== 'web' && onboarded ? <NotificationRouter /> : null}
         {onboarded ? <RemindersSync /> : null}
+        {onboarded ? <Housekeeping /> : null}
         <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}>
           <Stack.Protected guard={!onboarded}>
             <Stack.Screen name="onboarding" options={{ gestureEnabled: false }} />
@@ -83,6 +109,7 @@ export default function RootLayout() {
             <Stack.Screen name="settings" />
             <Stack.Screen name="book" options={{ presentation: 'modal' }} />
             <Stack.Screen name="close-day" options={{ presentation: 'modal' }} />
+            <Stack.Screen name="checkin" options={{ presentation: 'modal' }} />
             <Stack.Screen name="focus" options={{ presentation: 'modal', gestureEnabled: false }} />
             <Stack.Screen name="slot/[id]" options={{ presentation: 'modal' }} />
           </Stack.Protected>

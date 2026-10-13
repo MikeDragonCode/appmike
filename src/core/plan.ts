@@ -128,3 +128,58 @@ export function changeRestPerHour(data: UserData, restPerHour: number): UserData
     habits: data.habits.map((h) => (h.type === 'grind' && h.earnRate !== undefined ? { ...h, earnRate: h.earnRate * k } : h)),
   };
 }
+
+// ---- Follow-up check-ins (day 3, 7 and 14) ----
+
+export const CHECKIN_DAYS = [3, 7, 14] as const;
+
+function daysBetween(fromIso: string, to: Date): number {
+  const from = new Date(fromIso);
+  const a = new Date(from.getFullYear(), from.getMonth(), from.getDate()).getTime();
+  const b = new Date(to.getFullYear(), to.getMonth(), to.getDate()).getTime();
+  return Math.round((b - a) / 86_400_000);
+}
+
+// The latest check-in stage that has come due and was not answered yet.
+// Older missed stages are folded into the latest one: one question, not three.
+export function dueCheckin(data: UserData, now: Date): number | null {
+  const age = daysBetween(data.createdAt, now);
+  const done = data.checkinsDone ?? [];
+  const passed = CHECKIN_DAYS.filter((d) => d <= age);
+  const latest = passed[passed.length - 1];
+  if (latest === undefined || done.includes(latest)) return null;
+  return latest;
+}
+
+// Re-derives only the rules that come from "what is hardest", keeping every other setting.
+export function applyStruggles(profile: Profile, struggles: Struggle[]): Profile {
+  const fresh = buildProfile({
+    struggles,
+    paceHours: 8,
+    workEnd: profile.workEnd,
+    bedtime: profile.bedtime,
+    restPerHour: profile.restPerHour,
+    restDays: [],
+  });
+  return {
+    ...profile,
+    struggles,
+    hardBedtime: fresh.hardBedtime,
+    advanceCapMins: fresh.advanceCapMins,
+    defaultSlotMins: fresh.defaultSlotMins,
+    weeklySlotGoal: fresh.weeklySlotGoal,
+    remindClose: fresh.remindClose,
+    remindWindDown: fresh.remindWindDown,
+  };
+}
+
+// Marks a stage and everything before it as handled. Pass struggles to update the rules,
+// or leave them out to keep the plan as it is.
+export function completeCheckin(data: UserData, stage: number, struggles?: Struggle[]): UserData {
+  const done = Array.from(new Set([...(data.checkinsDone ?? []), ...CHECKIN_DAYS.filter((d) => d <= stage)]));
+  return {
+    ...data,
+    checkinsDone: done,
+    profile: struggles ? applyStruggles(data.profile, struggles) : data.profile,
+  };
+}

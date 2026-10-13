@@ -71,6 +71,7 @@ export interface UserData {
   profile: Profile;
   slots: Slot[];
   lastRecapDate?: string;
+  checkinsDone?: number[]; // follow-up stages already answered or dismissed (3, 7, 14)
 }
 
 export interface DayScore {

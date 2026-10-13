@@ -8,6 +8,7 @@ import {
   availableMins,
   dateToStr,
   doneSlotsLast7,
+  dueCheckin,
   getLast7Days,
   getLog,
   getSoftStreak,
@@ -48,6 +49,7 @@ export default function Today() {
   const yesterday = new Date(now);
   yesterday.setDate(yesterday.getDate() - 1);
   const firstTask = summarizeDay(data, yesterday).tomorrowFirst;
+  const checkin = dueCheckin(data, now);
   const streak = getSoftStreak(data, now);
   const goal = data.profile.weeklySlotGoal;
   const week = getLast7Days(data, now);
@@ -94,6 +96,13 @@ export default function Today() {
           <Button title="Book rest" accent={colors.glow} onPress={() => router.push('/book')} />
         )}
       </Card>
+
+      {checkin ? (
+        <Card onPress={() => router.push('/checkin')}>
+          <AppText variant="label">Day {checkin} check-in</AppText>
+          <AppText variant="body">Is the same thing still the hardest? Two minutes to tune your plan.</AppText>
+        </Card>
+      ) : null}
 
       {firstTask ? (
         <Card>
