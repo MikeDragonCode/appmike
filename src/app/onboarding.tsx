@@ -12,9 +12,11 @@ import {
   Struggle,
   buildProfile,
   createInitialData,
+  defaultWeekStart,
   describePlan,
   selectionIsValid,
 } from '@/core';
+import { deviceRegion } from '@/services/locale';
 import { ensurePermission, syncRoutineReminders } from '@/services/notifications';
 import { setData } from '@/state/store';
 import { colors, space } from '@/theme';
@@ -37,6 +39,7 @@ export default function Onboarding() {
   const [paceHours, setPaceHours] = useState(8);
   const [workEnd, setWorkEnd] = useState('18:00');
   const [bedtime, setBedtime] = useState('23:00');
+  const [weekStart, setWeekStart] = useState(() => defaultWeekStart(deviceRegion()));
   const [restDays, setRestDays] = useState<number[]>([0, 6]);
   const [grindIds, setGrindIds] = useState<string[]>(DEFAULT_GRIND_IDS);
   const [glowIds, setGlowIds] = useState<string[]>(DEFAULT_GLOW_IDS);
@@ -47,7 +50,7 @@ export default function Onboarding() {
   const [restoring, setRestoring] = useState(false);
 
   const selection: Selection = { grindIds, glowIds, customGrind, customGlow };
-  const answers = { struggles, paceHours, workEnd, bedtime, restPerHour, restDays };
+  const answers = { struggles, paceHours, workEnd, bedtime, restPerHour, restDays, weekStart };
   const plan = describePlan(buildProfile(answers));
 
   const canContinue =
@@ -102,10 +105,12 @@ export default function Onboarding() {
           paceHours={paceHours}
           workEnd={workEnd}
           bedtime={bedtime}
+          weekStart={weekStart}
           restDays={restDays}
           onPace={setPaceHours}
           onWorkEnd={setWorkEnd}
           onBedtime={setBedtime}
+          onWeekStart={setWeekStart}
           onRestDays={setRestDays}
         />
       ) : step === WORK_STEP ? (

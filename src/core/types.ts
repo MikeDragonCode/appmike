@@ -41,6 +41,7 @@ export interface Profile {
   advanceCapMins: number; // how far the bank may go below zero
   defaultSlotMins: number;
   weeklySlotGoal: number; // completed rest slots per week, 0 = off
+  weekStart?: number; // first day of the week, 0 = Sunday .. 6 = Saturday; missing = Monday
   remindClose: boolean; // daily nudge at workEnd to close the day
   remindWindDown: boolean; // nudge before bedtime
   remindBank: boolean; // nudge when earned rest piles up unbooked

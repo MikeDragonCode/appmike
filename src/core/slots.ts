@@ -190,14 +190,6 @@ export function finishSlot(
 
 export const skipSlot = (data: UserData, slotId: string, now: Date) => finishSlot(data, slotId, 0, now);
 
-// Completed rest slots in the last 7 days (today included) - the weekly goal.
-export function doneSlotsLast7(data: UserData, today: Date): number {
-  const from = new Date(today);
-  from.setDate(from.getDate() - 6);
-  from.setHours(0, 0, 0, 0);
-  return data.slots.filter((s) => s.state === 'done' && s.finishedAt && new Date(s.finishedAt) >= from).length;
-}
-
 export type RescheduleResult = { ok: true; data: UserData; slot: Slot } | { ok: false; error: BookError | 'not_planned'; shortBy?: number };
 
 // Moves a booked slot that has not started to a new time. The slot is checked as if it

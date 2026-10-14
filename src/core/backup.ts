@@ -70,6 +70,7 @@ export function isUserData(v: unknown): v is UserData {
     isNum(p.advanceCapMins) &&
     isNum(p.defaultSlotMins) &&
     isNum(p.weeklySlotGoal) &&
+    (p.weekStart === undefined || (isNum(p.weekStart) && Number.isInteger(p.weekStart) && p.weekStart >= 0 && p.weekStart <= 6)) &&
     Array.isArray(p.struggles)
   );
 }

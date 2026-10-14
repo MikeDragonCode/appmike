@@ -2,7 +2,7 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Linking, Platform, Pressable, StyleSheet, Switch, View } from 'react-native';
 
-import { PACE_OPTIONS, Profile, REST_PER_HOUR_MAX, REST_PER_HOUR_MIN, changeRestPerHour, shiftTime } from '@/core';
+import { PACE_OPTIONS, Profile, REST_PER_HOUR_MAX, REST_PER_HOUR_MIN, changeRestPerHour, shiftTime, weekStartOf } from '@/core';
 import { cancelAllReminders, ensurePermission } from '@/services/notifications';
 import { resetAll, updateData, useStore } from '@/state/store';
 import { colors, space } from '@/theme';
@@ -12,8 +12,7 @@ import Constants from 'expo-constants';
 import { Chip, Divider, Row, Stepper } from '@/ui/controls';
 import { Screen } from '@/ui/Screen';
 import { AppText } from '@/ui/Text';
-
-const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+import { WeekControls } from '@/ui/WeekControls';
 
 export default function Settings() {
   const router = useRouter();
@@ -52,22 +51,13 @@ export default function Settings() {
 
       <AppText variant="label">Rhythm</AppText>
       <Card style={styles.group}>
-        <AppText variant="body">Rest days</AppText>
-        <Row>
-          {DAY_NAMES.map((n, i) => (
-            <Chip
-              key={n}
-              label={n}
-              selected={data.restDays.includes(i)}
-              onPress={() =>
-                updateData((d) => ({
-                  ...d,
-                  restDays: d.restDays.includes(i) ? d.restDays.filter((x) => x !== i) : [...d.restDays, i],
-                }))
-              }
-            />
-          ))}
-        </Row>
+        <WeekControls
+          weekStart={weekStartOf(data)}
+          restDays={data.restDays}
+          labelVariant="body"
+          onWeekStart={(w) => updateData((d) => ({ ...d, profile: { ...d.profile, weekStart: w } }))}
+          onRestDays={(days) => updateData((d) => ({ ...d, restDays: days }))}
+        />
         <Divider />
         <AppText variant="body">Typical working day</AppText>
         <Row>

@@ -1,5 +1,6 @@
 import { formatHM, parseHM } from './time';
 import { Selection, materializeHabits } from './catalog';
+import { DEFAULT_WEEK_START } from './week';
 import { Profile, Struggle, UserData } from './types';
 
 export const STRUGGLES: { id: Struggle; title: string; hint: string }[] = [
@@ -34,6 +35,7 @@ export interface Answers {
   bedtime: string;
   restPerHour: number;
   restDays: number[];
+  weekStart?: number; // 0 = Sunday, 1 = Monday; Monday when not given
 }
 
 export const WIND_DOWN_BEFORE_BED_MINS = 45;
@@ -50,6 +52,7 @@ export function buildProfile(a: Answers): Profile {
     advanceCapMins: has('no_energy') ? 60 : 30,
     defaultSlotMins: has('no_energy') ? 30 : 60,
     weeklySlotGoal: has('no_time_hobbies') ? 3 : 0,
+    weekStart: a.weekStart ?? DEFAULT_WEEK_START,
     remindClose: has('overwork'),
     remindWindDown: has('sleep'),
     remindBank: true,

@@ -8,11 +8,11 @@ import {
   UserData,
   activeHabits,
   availableMins,
+  currentWeek,
   dateToStr,
-  doneSlotsLast7,
+  doneSlotsThisWeek,
   dismissRecap,
   dueCheckin,
-  getLast7Days,
   getLog,
   getSoftStreak,
   isRestDay,
@@ -61,7 +61,7 @@ export default function Today() {
   const recap = weeklyRecap(data, now);
   const streak = getSoftStreak(data, now);
   const goal = data.profile.weeklySlotGoal;
-  const week = getLast7Days(data, now);
+  const week = currentWeek(data, now);
 
   function addCount(h: HabitItem) {
     tap();
@@ -185,7 +185,7 @@ export default function Today() {
 
       <View style={styles.section}>
         <AppText variant="label">This week</AppText>
-        <WeekCard week={week} streak={streak} goal={goal} doneSlots={doneSlotsLast7(data, now)} onHistory={() => router.push('/history')} />
+        <WeekCard week={week} streak={streak} goal={goal} doneSlots={doneSlotsThisWeek(data, now)} onHistory={() => router.push('/history')} />
       </View>
 
     </Screen>

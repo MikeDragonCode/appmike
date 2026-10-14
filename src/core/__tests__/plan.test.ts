@@ -24,6 +24,11 @@ describe('buildProfile: what each answer switches on', () => {
     assert.equal(p.remindBank, true);
   });
 
+  it('week start: Monday unless asked otherwise', () => {
+    assert.equal(buildProfile(answers()).weekStart, 1);
+    assert.equal(buildProfile(answers([], { weekStart: 0 })).weekStart, 0);
+  });
+
   it('sleep: bedtime becomes a hard limit with a wind-down reminder', () => {
     const p = buildProfile(answers(['sleep']));
     assert.equal(p.hardBedtime, true);

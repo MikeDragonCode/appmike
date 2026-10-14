@@ -62,18 +62,6 @@ export function getBestStreak(data: UserData, today: Date): number {
   return Math.max(best, getStreak(data, today));
 }
 
-export function getLast7Days(data: UserData, today: Date): { date: string; score: number }[] {
-  const result: { date: string; score: number }[] = [];
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date(today);
-    d.setDate(d.getDate() - i);
-    const date = dateToStr(d);
-    const log = data.logs.find((l) => l.date === date);
-    result.push({ date, score: log?.score || 0 });
-  }
-  return result;
-}
-
 // Forgiving streak. A day with score > 20 extends it. Rest days are neutral.
 // Today without a log is still open. One missed workday is forgiven; the
 // streak ends only after two missed workdays in a row.

@@ -14,3 +14,4 @@ export * from './habits';
 export * from './backup';
 export * from './catalog';
 export * from './plan';
+export * from './week';

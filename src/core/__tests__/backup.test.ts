@@ -56,10 +56,18 @@ describe('parseBackup rejects', () => {
     assert.equal(parseBackup(wrap({ ...d, logs: [{ date: 'yesterday' }] })).ok, false);
     assert.equal(parseBackup(wrap({ ...d, slots: [{ id: 's', habitId: 'g', plannedMins: 5, startsAt: 'x', state: 'planned', reservedCost: 1 }] })).ok, false);
     assert.equal(parseBackup(wrap({ ...d, onboardingComplete: false })).ok, false);
+    assert.equal(parseBackup(wrap({ ...d, profile: { ...d.profile, weekStart: 9 } })).ok, false);
+    assert.equal(parseBackup(wrap({ ...d, profile: { ...d.profile, weekStart: 'monday' } })).ok, false);
   });
 });
 
 describe('isUserData', () => {
+  it('accepts data saved before the week start existed, and either weekday for it', () => {
+    assert.equal(isUserData(makeData()), true); // no weekStart in the fixture
+    assert.equal(isUserData(makeData({ profile: { ...makeData().profile, weekStart: 0 } })), true);
+    assert.equal(isUserData(makeData({ profile: { ...makeData().profile, weekStart: 1 } })), true);
+  });
+
   it('accepts normal app data and rejects NaN numbers', () => {
     assert.equal(isUserData(richData()), true);
     assert.equal(isUserData({ ...makeData(), earnedTimeBank: NaN }), false);

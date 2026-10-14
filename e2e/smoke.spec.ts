@@ -312,3 +312,75 @@ test('activities can be added in Settings, and a duplicate name is refused', asy
   await expect(page.getByText('You already have one with that name.')).toBeVisible();
   await expect(page.getByLabel('New way to rest')).toHaveValue('Reading by lamp'); // kept so it can be fixed
 });
+
+const WEEKDAYS = /^(Mon|Tue|Wed|Thu|Fri|Sat|Sun)$/;
+
+test.describe('the week starts where the phone region says it does', () => {
+  test.describe('in the UK', () => {
+    test.use({ locale: 'en-GB' });
+    test('Monday first, with today in its own place and the days to come left empty', async ({ page }) => {
+      await open(page); // Tuesday 13 October
+      await onboard(page);
+      await expect(page.getByText(WEEKDAYS)).toHaveText(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']);
+      await expect(page.getByLabel('Today')).toHaveText('Tue');
+    });
+
+    test('a weekly recap waits for the new week: not on Sunday, there on Monday', async ({ page }) => {
+      await open(page);
+      await onboard(page);
+      await logDeepWork(page, 120);
+      await page.clock.fastForward(113.5 * 3_600_000); // Sunday 18 October, 12:00
+      await page.clock.runFor(16_000);
+      await expect(page.getByText('Your week', { exact: true })).toHaveCount(0);
+      await page.clock.fastForward(21 * 3_600_000); // Monday 19 October, 09:00
+      await page.clock.runFor(16_000);
+      await expect(page.getByText('You worked 2h and rested 0m.')).toBeVisible();
+    });
+  });
+
+  test.describe('in the US', () => {
+    test.use({ locale: 'en-US' });
+    test('Sunday first', async ({ page }) => {
+      await open(page);
+      await onboard(page);
+      await expect(page.getByText(WEEKDAYS)).toHaveText(['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']);
+      await expect(page.getByLabel('Today')).toHaveText('Tue');
+    });
+  });
+
+  test.describe('in Portugal', () => {
+    test.use({ locale: 'pt-PT' });
+    test('Monday, even though some calendars there start on Sunday', async ({ page }) => {
+      await open(page);
+      await onboard(page);
+      await tap(page, 'Settings');
+      await expect(page.getByRole('button', { name: 'Monday' })).toHaveAttribute('aria-selected', 'true');
+      await expect(page.getByRole('button', { name: 'Sunday' })).toHaveAttribute('aria-selected', 'false');
+    });
+  });
+});
+
+test('the week start can be chosen while setting up, and rest days are listed in that order', async ({ page }) => {
+  await open(page); // en-US: Sunday first by default
+  await tap(page, 'Begin');
+  await tap(page, 'Continue'); // Your rhythm
+  const days = page.getByRole('button', { name: WEEKDAYS });
+  await expect(days).toHaveText(['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']);
+  await tap(page, 'Monday');
+  await expect(days).toHaveText(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']);
+  await expect(page.getByRole('button', { name: 'Sat' })).toHaveAttribute('aria-selected', 'true'); // rest days kept
+  for (let i = 0; i < 4; i++) await tap(page, 'Continue');
+  await tap(page, 'Start');
+  await expect(page.getByText(WEEKDAYS)).toHaveText(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']);
+});
+
+test('Settings can change the week start, and Today follows', async ({ page }) => {
+  await open(page);
+  await onboard(page);
+  await expect(page.getByText(WEEKDAYS)).toHaveText(['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']);
+  await tap(page, 'Settings');
+  await tap(page, 'Monday');
+  await expect(page.getByRole('button', { name: WEEKDAYS })).toHaveText(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']);
+  await tap(page, 'Done');
+  await expect(page.getByText(WEEKDAYS)).toHaveText(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']);
+});

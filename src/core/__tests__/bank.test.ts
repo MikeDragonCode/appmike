@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { applyDayLog, dateToStr, getBestStreak, getLast7Days, getSoftStreak, getStreak, isRestDay } from '../bank';
+import { applyDayLog, dateToStr, getBestStreak, getSoftStreak, getStreak, isRestDay } from '../bank';
 import { DayLog } from '../types';
 import { makeData } from './fixtures';
 
@@ -97,19 +97,6 @@ describe('getBestStreak', () => {
       ],
     });
     assert.equal(getBestStreak(data, TODAY), 3);
-  });
-});
-
-describe('getLast7Days', () => {
-  it('returns 7 entries, oldest first, zero for days without a log', () => {
-    const data = makeData({ logs: [log('2026-10-13', 90), log('2026-10-10', 40)] });
-    const days = getLast7Days(data, TODAY);
-    assert.equal(days.length, 7);
-    assert.equal(days[0].date, '2026-10-07');
-    assert.equal(days[6].date, '2026-10-13');
-    assert.equal(days[6].score, 90);
-    assert.equal(days[3].score, 40);
-    assert.equal(days[1].score, 0);
   });
 });
 

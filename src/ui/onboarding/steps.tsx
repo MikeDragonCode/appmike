@@ -12,18 +12,13 @@ import {
 import { colors, space } from '@/theme';
 import { Button } from '@/ui/Button';
 import { Card } from '@/ui/Card';
-import { Chip, Row, Stepper } from '@/ui/controls';
+import { Stepper } from '@/ui/controls';
 import { fmtMins } from '@/ui/format';
 import { tap } from '@/ui/haptics';
 import { AppText } from '@/ui/Text';
+import { WeekControls } from '@/ui/WeekControls';
 
 // One small component per questionnaire step. They hold no state: the screen owns the answers.
-
-const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
-function toggle<T>(list: T[], item: T): T[] {
-  return list.includes(item) ? list.filter((x) => x !== item) : [...list, item];
-}
 
 export function WelcomeStep({ onRestore }: { onRestore: () => void }) {
   return (
@@ -71,14 +66,16 @@ interface RhythmProps {
   paceHours: number;
   workEnd: string;
   bedtime: string;
+  weekStart: number;
   restDays: number[];
   onPace: (hours: number) => void;
   onWorkEnd: (t: string) => void;
   onBedtime: (t: string) => void;
+  onWeekStart: (day: number) => void;
   onRestDays: (days: number[]) => void;
 }
 
-export function RhythmStep({ paceHours, workEnd, bedtime, restDays, onPace, onWorkEnd, onBedtime, onRestDays }: RhythmProps) {
+export function RhythmStep({ paceHours, workEnd, bedtime, weekStart, restDays, onPace, onWorkEnd, onBedtime, onWeekStart, onRestDays }: RhythmProps) {
   return (
     <View style={styles.block}>
       <AppText variant="title">Your rhythm</AppText>
@@ -91,12 +88,7 @@ export function RhythmStep({ paceHours, workEnd, bedtime, restDays, onPace, onWo
       ))}
       <Stepper label="Workday ends" value={workEnd} onMinus={() => onWorkEnd(shiftTime(workEnd, -15))} onPlus={() => onWorkEnd(shiftTime(workEnd, 15))} />
       <Stepper label="Bedtime" value={bedtime} onMinus={() => onBedtime(shiftTime(bedtime, -15))} onPlus={() => onBedtime(shiftTime(bedtime, 15))} />
-      <AppText variant="label">Rest days</AppText>
-      <Row>
-        {DAY_NAMES.map((n, i) => (
-          <Chip key={n} label={n} selected={restDays.includes(i)} onPress={() => onRestDays(toggle(restDays, i))} />
-        ))}
-      </Row>
+      <WeekControls weekStart={weekStart} restDays={restDays} onWeekStart={onWeekStart} onRestDays={onRestDays} />
       <AppText variant="small">On rest days, rest costs half and a day with no work is fine.</AppText>
     </View>
   );

@@ -13,7 +13,7 @@ export function Chip({ label, selected, onPress, tint = colors.text }: ChipProps
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityState={{ selected }}
+      aria-selected={selected}
       onPress={onPress}
       style={[styles.chip, selected ? { backgroundColor: tint, borderColor: tint } : null]}
     >

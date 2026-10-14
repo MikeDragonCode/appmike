@@ -1,15 +1,15 @@
 import { StyleSheet, View } from 'react-native';
-import { getLast7Days } from '@/core';
+import { WeekDay } from '@/core';
 import { colors, radius, space } from '@/theme';
 import { Button } from '@/ui/Button';
 import { Card } from '@/ui/Card';
 import { AppText } from '@/ui/Text';
 
 interface Props {
-  week: ReturnType<typeof getLast7Days>;
+  week: WeekDay[]; // the calendar week, first day first
   streak: number;
   goal: number; // weekly rest-slot goal, 0 = none
-  doneSlots: number;
+  doneSlots: number; // rest slots completed this week
   onHistory: () => void;
 }
 
@@ -18,11 +18,15 @@ export function WeekCard({ week, streak, goal, doneSlots, onHistory }: Props) {
     <Card>
       <View style={styles.bars}>
         {week.map((d) => (
-          <View key={d.date} style={styles.col}>
-            <View style={styles.track}>
-              <View style={[styles.bar, { height: `${Math.max(4, Math.min(100, d.score))}%` }, d.score === 0 ? styles.empty : null]} />
+          <View key={d.date} style={styles.col} accessibilityLabel={d.isToday ? 'Today' : undefined}>
+            <View style={[styles.track, d.isToday ? styles.trackToday : null, d.isFuture ? styles.trackFuture : null]}>
+              {d.isFuture ? null : (
+                <View style={[styles.bar, { height: `${Math.max(4, Math.min(100, d.score))}%` }, d.score === 0 ? styles.empty : null]} />
+              )}
             </View>
-            <AppText variant="small">{new Date(`${d.date}T12:00:00`).toLocaleDateString(undefined, { weekday: 'narrow' })}</AppText>
+            <AppText variant="small" color={d.isToday ? colors.text : undefined} style={d.isToday ? styles.todayLabel : null} numberOfLines={1}>
+              {new Date(`${d.date}T12:00:00`).toLocaleDateString(undefined, { weekday: 'short' })}
+            </AppText>
           </View>
         ))}
       </View>
@@ -31,7 +35,7 @@ export function WeekCard({ week, streak, goal, doneSlots, onHistory }: Props) {
       </AppText>
       {goal > 0 ? (
         <AppText variant="small">
-          Rest taken on purpose: {Math.min(doneSlots, 99)} of {goal} this week.
+          Rest taken on purpose this week: {Math.min(doneSlots, 99)} of {goal}.
         </AppText>
       ) : null}
       <Button small kind="ghost" title="History" style={styles.history} onPress={onHistory} />
@@ -40,10 +44,13 @@ export function WeekCard({ week, streak, goal, doneSlots, onHistory }: Props) {
 }
 
 const styles = StyleSheet.create({
-  bars: { flexDirection: 'row', justifyContent: 'space-between', gap: space.sm, height: 80, marginBottom: space.sm },
+  bars: { flexDirection: 'row', justifyContent: 'space-between', gap: 6, height: 84, marginBottom: space.sm },
   col: { flex: 1, alignItems: 'center', gap: 4 },
-  track: { flex: 1, width: '100%', justifyContent: 'flex-end', backgroundColor: colors.surfaceHigh, borderRadius: radius.sm, overflow: 'hidden' },
+  track: { flex: 1, width: '100%', justifyContent: 'flex-end', backgroundColor: colors.surfaceHigh, borderRadius: radius.sm, overflow: 'hidden', borderWidth: 1, borderColor: 'transparent' },
+  trackToday: { borderColor: colors.muted },
+  trackFuture: { backgroundColor: 'transparent', borderColor: colors.border, borderStyle: 'dashed' },
   bar: { width: '100%', backgroundColor: colors.good },
   empty: { backgroundColor: colors.border },
+  todayLabel: { fontWeight: '700' },
   history: { alignSelf: 'flex-start', marginTop: space.sm },
 });

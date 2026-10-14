@@ -1,9 +1,10 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  availableMins, bookSlot, doneSlotsLast7, finishSlot, glowCost, nextOpenSlot, reservedMins, rescheduleSlot, skipSlot, startSlot, bedtimeFixes,
+  availableMins, bookSlot, finishSlot, glowCost, nextOpenSlot, reservedMins, rescheduleSlot, skipSlot, startSlot, bedtimeFixes,
 } from '../slots';
-import { Slot, UserData } from '../types';
+import { UserData } from '../types';
+import { doneSlotsThisWeek } from '../week';
 import { defaultProfile, doom, deepWork, makeData, ps5 } from './fixtures';
 
 // Tuesday 2026-10-13, 18:00 local. Saturday 17 Oct is a rest day (restDays 0 and 6).
@@ -159,7 +160,7 @@ describe('finishSlot', () => {
     assert.equal(r.outcome.returned, 55);
     assert.equal(r.outcome.message, 'Used 5 of 60 min. The rest went back to your bank.');
     assert.equal(r.data.earnedTimeBank, 95);
-    assert.equal(doneSlotsLast7(r.data, at(20)), 0, 'a partial slot does not count toward the weekly goal');
+    assert.equal(doneSlotsThisWeek(r.data, at(20)), 0, 'a partial slot does not count toward the weekly goal');
   });
 
   it('skipped: nothing spent, no glow entry in the day log', () => {
@@ -220,26 +221,6 @@ describe('finishSlot', () => {
     assert.deepEqual(log.glowLogs, [{ habitId: 'gl1', value: 40 }]);
     assert.equal(log.score, 100, '60 earned, 40 spent: Perfect Balance');
     assert.equal(r.data.earnedTimeBank, 20);
-  });
-});
-
-describe('doneSlotsLast7', () => {
-  const slot = (id: string, state: Slot['state'], finishedAt?: Date): Slot => ({
-    id, habitId: 'gl1', plannedMins: 60, startsAt: NOW.toISOString(), state, reservedCost: 0,
-    finishedAt: finishedAt?.toISOString(),
-  });
-
-  it('counts only done slots finished within the last seven days', () => {
-    const data = makeData({
-      slots: [
-        slot('a', 'done', new Date(2026, 9, 13, 10)),
-        slot('b', 'done', new Date(2026, 9, 7, 23, 0)),
-        slot('c', 'done', new Date(2026, 9, 6, 23, 0)),
-        slot('d', 'partial', new Date(2026, 9, 13, 11)),
-        slot('e', 'skipped', new Date(2026, 9, 13, 12)),
-      ],
-    });
-    assert.equal(doneSlotsLast7(data, NOW), 2);
   });
 });
 
