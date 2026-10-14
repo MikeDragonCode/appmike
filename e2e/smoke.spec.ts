@@ -278,6 +278,28 @@ test('Close the day is reachable on the first screen, without scrolling', async 
   await expect(page.getByText('First thing tomorrow')).toBeVisible();
 });
 
+test('what scrolls up under the status bar is hidden, not shown through it', async ({ page }) => {
+  // A phone with a notch: Chromium can pretend the top 59 points belong to the status bar.
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send('Emulation.setSafeAreaInsetsOverride', { insets: { top: 59, bottom: 34, left: 0, right: 0 } });
+  await open(page);
+  await onboard(page);
+  const strip = { x: 0, y: 0, width: 390, height: 59 };
+  const label = page.getByText('Rest you can book');
+  const before = await page.screenshot({ clip: strip });
+  const y0 = (await label.boundingBox())!.y;
+
+  await page.mouse.move(200, 500);
+  await page.mouse.wheel(0, 150);
+  await page.waitForTimeout(300);
+
+  const y1 = (await label.boundingBox())!.y;
+  expect(y1).toBeLessThan(y0 - 100); // the card really moved up
+  expect(y1).toBeLessThan(59); // and its first line is now behind the status bar
+  const after = await page.screenshot({ clip: strip });
+  expect(after.equals(before)).toBe(true); // yet nothing of it shows there
+});
+
 test('onboarding lets you add your own activity and remove it again', async ({ page }) => {
   await open(page);
   await tap(page, 'Begin');
