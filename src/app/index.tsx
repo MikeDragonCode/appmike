@@ -63,6 +63,8 @@ export default function Today() {
   const streak = getSoftStreak(data, now);
   const goal = data.profile.weeklySlotGoal;
   const week = currentWeek(data, now);
+  // Once the day is closed the main action stays available but stops calling out for attention.
+  const mainKind = hint.kind === 'closed' ? 'secondary' : 'primary';
 
   function addCount(h: HabitItem) {
     tap();
@@ -116,11 +118,12 @@ export default function Today() {
         ) : avail < data.profile.defaultSlotMins && firstFocus ? (
           <Button
             title={`Start ${firstFocus.name}`}
+            kind={mainKind}
             accent={colors.grind}
             onPress={() => router.push({ pathname: '/focus', params: { habitId: firstFocus.id } })}
           />
         ) : (
-          <Button title="Book rest" accent={colors.glow} onPress={() => router.push('/book')} />
+          <Button title="Book rest" kind={mainKind} accent={colors.glow} onPress={() => router.push('/book')} />
         )}
         <Button small kind="ghost" title="Log rest I already took" onPress={() => router.push('/log-rest')} />
         {hint.kind !== 'close' && !day.closed ? (

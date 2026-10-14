@@ -1,9 +1,9 @@
 import { StyleSheet, View } from 'react-native';
 import { WeekDay } from '@/core';
 import { colors, radius, space } from '@/theme';
-import { Button } from '@/ui/Button';
 import { Card } from '@/ui/Card';
 import { AppText } from '@/ui/Text';
+import { TextButton } from '@/ui/TextButton';
 
 interface Props {
   week: WeekDay[]; // the calendar week, first day first
@@ -38,7 +38,9 @@ export function WeekCard({ week, streak, goal, doneSlots, onHistory }: Props) {
           Rest taken on purpose this week: {Math.min(doneSlots, 99)} of {goal}.
         </AppText>
       ) : null}
-      <Button small kind="ghost" title="History" style={styles.history} onPress={onHistory} />
+      <View style={styles.history}>
+        <TextButton title="History" onPress={onHistory} />
+      </View>
     </Card>
   );
 }
