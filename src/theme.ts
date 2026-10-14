@@ -1,16 +1,16 @@
-// Design tokens. Dark only, calm and minimal.
+// Design tokens. Dark only: a warm evening room, lamp light on linen and wood.
 export const colors = {
-  bg: '#13111c',
-  surface: '#1e1b2e',
-  surfaceHigh: '#292540',
-  border: '#2f2b47',
-  text: '#f8f7fa',
-  muted: '#9f9bad',
-  grind: '#fb923c',
-  glow: '#a855f7',
-  good: '#10b981',
-  danger: '#f87171',
-  onAccent: '#13111c',
+  bg: '#1b1713',
+  surface: '#251f1a',
+  surfaceHigh: '#312a23',
+  border: '#3a3229',
+  text: '#f4ece0',
+  muted: '#a89d8d',
+  grind: '#e3a05a', // work: lamp amber
+  glow: '#a9c09a', // rest: sage
+  good: '#b8c98f',
+  danger: '#e8806f',
+  onAccent: '#1b1713',
 } as const;
 
 export const radius = { sm: 8, md: 16, pill: 9999 } as const;

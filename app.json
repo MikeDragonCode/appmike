@@ -7,7 +7,7 @@
     "icon": "./assets/images/icon.png",
     "scheme": "shifttolife",
     "userInterfaceStyle": "dark",
-    "backgroundColor": "#13111c",
+    "backgroundColor": "#1b1713",
     "ios": {
       "supportsTablet": false,
       "infoPlist": {
@@ -17,7 +17,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#13111c",
+        "backgroundColor": "#1b1713",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
@@ -34,7 +34,7 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#13111c",
+          "backgroundColor": "#1b1713",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 140
         }
@@ -42,7 +42,7 @@
       [
         "expo-notifications",
         {
-          "color": "#a855f7"
+          "color": "#a9c09a"
         }
       ]
     ],
