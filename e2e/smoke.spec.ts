@@ -230,6 +230,7 @@ test('the how-it-works guide opens from settings', async ({ page }) => {
   await open(page);
   await onboard(page);
   await tap(page, 'Settings');
+  await expect(page.getByText(/^Version \d+\.\d+\.\d+$/)).toBeVisible();
   await tap(page, 'How it works');
   await expect(page.getByText('Work earns rest', { exact: true })).toBeVisible();
   await page.getByText('Done', { exact: true }).last().click(); // Settings stays mounted underneath

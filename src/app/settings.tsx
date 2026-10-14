@@ -8,6 +8,7 @@ import { resetAll, updateData, useStore } from '@/state/store';
 import { colors, space } from '@/theme';
 import { Button } from '@/ui/Button';
 import { Card } from '@/ui/Card';
+import Constants from 'expo-constants';
 import { Chip, Divider, Row, Stepper } from '@/ui/controls';
 import { Screen } from '@/ui/Screen';
 import { AppText } from '@/ui/Text';
@@ -169,6 +170,7 @@ export default function Settings() {
       <AppText variant="label">About</AppText>
       <Card style={styles.group}>
         <Button kind="secondary" title="How it works" onPress={() => router.push('/how-it-works')} />
+        <AppText variant="small">Version {Constants.expoConfig?.version ?? '?'}</AppText>
         <AppText variant="small">
           Shift to Life keeps everything on this phone. There is no account and no tracking.
         </AppText>
