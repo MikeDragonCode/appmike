@@ -26,14 +26,16 @@ import {
 import { undo } from '@/state/actions';
 import { updateData, useStore } from '@/state/store';
 import { useNow } from '@/hooks/useNow';
-import { colors, radius, space } from '@/theme';
+import { colors, space } from '@/theme';
 import { Button } from '@/ui/Button';
 import { Card } from '@/ui/Card';
-import { Divider } from '@/ui/controls';
 import { dayWord, fmtClock, fmtMins, greeting } from '@/ui/format';
 import { success, tap } from '@/ui/haptics';
 import { Screen } from '@/ui/Screen';
 import { AppText } from '@/ui/Text';
+import { RecapCard } from '@/ui/today/RecapCard';
+import { WeekCard } from '@/ui/today/WeekCard';
+import { WorkList } from '@/ui/today/WorkList';
 
 export default function Today() {
   const router = useRouter();
@@ -124,6 +126,9 @@ export default function Today() {
           <Button title="Book rest" accent={colors.glow} onPress={() => router.push('/book')} />
         )}
         <Button small kind="ghost" title="Log rest I already took" onPress={() => router.push('/log-rest')} />
+        {hint.kind !== 'close' && !day.closed ? (
+          <Button small kind="ghost" title="Close the day" onPress={() => router.push('/close-day')} />
+        ) : null}
       </Card>
 
       {checkin ? (
@@ -133,30 +138,7 @@ export default function Today() {
         </Card>
       ) : null}
 
-      {recap ? (
-        <Card>
-          <AppText variant="label">Your week</AppText>
-          <AppText variant="body">
-            You worked {fmtMins(recap.workMins)} and rested {fmtMins(recap.restMins)}.
-          </AppText>
-          {recap.restSlots > 0 ? (
-            <AppText variant="small">
-              {recap.restSlots} rest {recap.restSlots === 1 ? 'slot' : 'slots'} taken on purpose.
-            </AppText>
-          ) : null}
-          {recap.goodDays > 0 ? (
-            <AppText variant="small">
-              {recap.goodDays} good {recap.goodDays === 1 ? 'day' : 'days'}.
-            </AppText>
-          ) : null}
-          {recap.slotGoal > 0 ? (
-            <AppText variant="small">
-              {recap.restSlots >= recap.slotGoal ? 'Weekly rest goal reached.' : `The goal was ${recap.slotGoal}. A new week starts now.`}
-            </AppText>
-          ) : null}
-          <Button small kind="secondary" title="Got it" style={styles.recapBtn} onPress={() => updateData((d) => dismissRecap(d, new Date()))} />
-        </Card>
-      ) : null}
+      {recap ? <RecapCard recap={recap} onDismiss={() => updateData((d) => dismissRecap(d, new Date()))} /> : null}
 
       {firstTask ? (
         <Card>
@@ -187,87 +169,25 @@ export default function Today() {
         </Card>
       ) : null}
 
-      <View style={styles.section}>
-        <AppText variant="label">Work</AppText>
-        <Card>
-          {grind.map((h, i) => {
-            const logged = todayLog?.grindLogs.find((l) => l.habitId === h.id)?.value ?? 0;
-            return (
-              <View key={h.id}>
-                {i > 0 ? <Divider /> : null}
-                <View style={styles.item}>
-                  <View style={styles.flex}>
-                    <AppText variant="body">
-                      {h.emoji} {h.name}
-                    </AppText>
-                    <AppText variant="small">
-                      {h.valueType === 'duration'
-                        ? `${fmtMins(logged)} today, ${Math.round((h.earnRate ?? 0) * 60)} min rest per hour`
-                        : `${logged} today, ${Math.round(h.earnRate ?? 0)} min rest each`}
-                    </AppText>
-                  </View>
-                  {h.valueType === 'duration' ? (
-                    <Button
-                      small
-                      kind="secondary"
-                      title={focus?.habitId === h.id ? 'Open' : 'Start'}
-                      onPress={() => router.push({ pathname: '/focus', params: { habitId: h.id } })}
-                    />
-                  ) : (
-                    <Button small kind="secondary" title="+1" onPress={() => addCount(h)} />
-                  )}
-                </View>
-              </View>
-            );
-          })}
-        </Card>
-        {toast ? (
-          <View style={styles.toast}>
-            <AppText variant="small" color={colors.good}>
-              {toast.text}
-            </AppText>
-            <Pressable
-              accessibilityRole="button"
-              hitSlop={12}
-              onPress={() => {
-                undo('work', toast.habitId, 1);
-                setToast(null);
-              }}
-            >
-              <AppText variant="small" color={colors.text}>
-                Undo
-              </AppText>
-            </Pressable>
-          </View>
-        ) : null}
-      </View>
+      <WorkList
+        habits={grind}
+        loggedToday={(id) => todayLog?.grindLogs.find((l) => l.habitId === id)?.value ?? 0}
+        runningHabitId={focus?.habitId}
+        toast={toast}
+        onStart={(h) => router.push({ pathname: '/focus', params: { habitId: h.id } })}
+        onAdd={addCount}
+        onUndo={() => {
+          if (!toast) return;
+          undo('work', toast.habitId, 1);
+          setToast(null);
+        }}
+      />
 
       <View style={styles.section}>
         <AppText variant="label">This week</AppText>
-        <Card>
-          <View style={styles.bars}>
-            {week.map((d) => (
-              <View key={d.date} style={styles.barCol}>
-                <View style={styles.barTrack}>
-                  <View style={[styles.bar, { height: `${Math.max(4, Math.min(100, d.score))}%` }, d.score === 0 ? styles.barEmpty : null]} />
-                </View>
-                <AppText variant="small">{new Date(`${d.date}T12:00:00`).toLocaleDateString(undefined, { weekday: 'narrow' })}</AppText>
-              </View>
-            ))}
-          </View>
-          <AppText variant="small">
-            {streak > 0 ? `${streak} good ${streak === 1 ? 'day' : 'days'} in a row. A missed day does not reset it, two in a row do.` : 'No pressure. Good days add up here.'}
-          </AppText>
-          {goal > 0 ? (
-            <AppText variant="small">
-              Rest taken on purpose: {Math.min(doneSlotsLast7(data, now), 99)} of {goal} this week.
-            </AppText>
-          ) : null}
-          <Button small kind="ghost" title="History" style={styles.recapBtn} onPress={() => router.push('/history')} />
-        </Card>
+        <WeekCard week={week} streak={streak} goal={goal} doneSlots={doneSlotsLast7(data, now)} onHistory={() => router.push('/history')} />
       </View>
 
-      {hint.kind !== 'close' && !day.closed ? <Button kind="ghost" title="Close the day" onPress={() => router.push('/close-day')} /> : null}
     </Screen>
   );
 }
@@ -277,13 +197,5 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   bank: { gap: space.sm, padding: space.xl },
   hint: { marginTop: space.xs, marginBottom: space.sm },
-  toast: { flexDirection: 'row', alignItems: 'center', gap: space.lg },
-  recapBtn: { alignSelf: 'flex-start', marginTop: space.sm },
   section: { gap: space.sm },
-  item: { flexDirection: 'row', alignItems: 'center', gap: space.md, paddingVertical: space.sm },
-  bars: { flexDirection: 'row', justifyContent: 'space-between', gap: space.sm, height: 80, marginBottom: space.sm },
-  barCol: { flex: 1, alignItems: 'center', gap: 4 },
-  barTrack: { flex: 1, width: '100%', justifyContent: 'flex-end', backgroundColor: colors.surfaceHigh, borderRadius: radius.sm, overflow: 'hidden' },
-  bar: { width: '100%', backgroundColor: colors.good },
-  barEmpty: { backgroundColor: colors.border },
 });

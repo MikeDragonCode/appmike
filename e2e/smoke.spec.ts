@@ -269,3 +269,11 @@ test('a failed save is reported, and the warning goes away once saving works aga
   await logDeepWork(page, 30);
   await expect(page.getByText('Not saved', { exact: true })).toHaveCount(0);
 });
+
+test('Close the day is reachable on the first screen, without scrolling', async ({ page }) => {
+  await open(page);
+  await onboard(page);
+  await expect(page.getByRole('button', { name: 'Close the day' })).toBeInViewport();
+  await tap(page, 'Close the day');
+  await expect(page.getByText('First thing tomorrow')).toBeVisible();
+});

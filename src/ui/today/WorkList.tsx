@@ -1,0 +1,72 @@
+import { Pressable, StyleSheet, View } from 'react-native';
+import { HabitItem } from '@/core';
+import { colors, space } from '@/theme';
+import { Button } from '@/ui/Button';
+import { Card } from '@/ui/Card';
+import { Divider } from '@/ui/controls';
+import { fmtMins } from '@/ui/format';
+import { AppText } from '@/ui/Text';
+
+interface Props {
+  habits: HabitItem[];
+  loggedToday: (habitId: string) => number;
+  runningHabitId?: string; // the habit with a focus timer going
+  toast: { text: string } | null;
+  onStart: (h: HabitItem) => void;
+  onAdd: (h: HabitItem) => void;
+  onUndo: () => void;
+}
+
+export function WorkList({ habits, loggedToday, runningHabitId, toast, onStart, onAdd, onUndo }: Props) {
+  return (
+    <View style={styles.section}>
+      <AppText variant="label">Work</AppText>
+      <Card>
+        {habits.map((h, i) => {
+          const logged = loggedToday(h.id);
+          return (
+            <View key={h.id}>
+              {i > 0 ? <Divider /> : null}
+              <View style={styles.item}>
+                <View style={styles.flex}>
+                  <AppText variant="body">
+                    {h.emoji} {h.name}
+                  </AppText>
+                  <AppText variant="small">
+                    {h.valueType === 'duration'
+                      ? `${fmtMins(logged)} today, ${Math.round((h.earnRate ?? 0) * 60)} min rest per hour`
+                      : `${logged} today, ${Math.round(h.earnRate ?? 0)} min rest each`}
+                  </AppText>
+                </View>
+                {h.valueType === 'duration' ? (
+                  <Button small kind="secondary" title={runningHabitId === h.id ? 'Open' : 'Start'} onPress={() => onStart(h)} />
+                ) : (
+                  <Button small kind="secondary" title="+1" onPress={() => onAdd(h)} />
+                )}
+              </View>
+            </View>
+          );
+        })}
+      </Card>
+      {toast ? (
+        <View style={styles.toast}>
+          <AppText variant="small" color={colors.good}>
+            {toast.text}
+          </AppText>
+          <Pressable accessibilityRole="button" hitSlop={12} onPress={onUndo}>
+            <AppText variant="small" color={colors.text}>
+              Undo
+            </AppText>
+          </Pressable>
+        </View>
+      ) : null}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  section: { gap: space.sm },
+  flex: { flex: 1 },
+  item: { flexDirection: 'row', alignItems: 'center', gap: space.md, paddingVertical: space.sm },
+  toast: { flexDirection: 'row', alignItems: 'center', gap: space.lg },
+});
