@@ -1,6 +1,5 @@
-import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 
 import { HistoryDay, activeHabits, listDays, setLogEntry } from '@/core';
 import { updateData, useStore } from '@/state/store';
@@ -9,11 +8,12 @@ import { Card } from '@/ui/Card';
 import { Chip, Row, Stepper } from '@/ui/controls';
 import { dayWord, fmtMins } from '@/ui/format';
 import { tap } from '@/ui/haptics';
+import { ModalHeader } from '@/ui/ModalHeader';
 import { Screen } from '@/ui/Screen';
 import { AppText } from '@/ui/Text';
+import { TextButton } from '@/ui/TextButton';
 
 export default function History() {
-  const router = useRouter();
   const { data } = useStore();
   const [adding, setAdding] = useState<string | null>(null); // date whose picker is open
   if (!data) return null;
@@ -28,16 +28,7 @@ export default function History() {
 
   return (
     <Screen>
-      <View style={styles.header}>
-        <AppText variant="title" style={styles.flex}>
-          History
-        </AppText>
-        <Pressable accessibilityRole="button" onPress={() => router.back()} hitSlop={12}>
-          <AppText variant="small" color={colors.text}>
-            Done
-          </AppText>
-        </Pressable>
-      </View>
+      <ModalHeader title="History" action="Done" />
       <AppText variant="small">
         Fix what you logged, or add something you forgot. Changes move your bank by the difference only.
       </AppText>
@@ -104,11 +95,7 @@ function DayCard({
           />
         );
       })}
-      <Pressable accessibilityRole="button" onPress={onToggleAdd} hitSlop={8}>
-        <AppText variant="small" color={colors.text}>
-          {adding ? 'Hide' : 'Add an entry'}
-        </AppText>
-      </Pressable>
+      <TextButton title={adding ? 'Hide' : 'Add an entry'} onPress={onToggleAdd} />
       {adding ? (
         <Row>
           {addable.map((h) => (
@@ -130,7 +117,5 @@ function DayCard({
 }
 
 const styles = StyleSheet.create({
-  header: { flexDirection: 'row', alignItems: 'center', gap: space.md },
-  flex: { flex: 1 },
   day: { gap: space.md },
 });

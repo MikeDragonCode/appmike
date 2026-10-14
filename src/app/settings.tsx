@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Linking, Platform, Pressable, StyleSheet, Switch, View } from 'react-native';
+import { Linking, Platform, StyleSheet, Switch, View } from 'react-native';
 
 import { PACE_OPTIONS, Profile, REST_PER_HOUR_MAX, REST_PER_HOUR_MIN, changeRestPerHour, shiftTime, weekStartOf } from '@/core';
 import { cancelAllReminders, ensurePermission } from '@/services/notifications';
@@ -10,6 +10,7 @@ import { Button } from '@/ui/Button';
 import { Card } from '@/ui/Card';
 import Constants from 'expo-constants';
 import { Chip, Divider, Row, Stepper } from '@/ui/controls';
+import { ModalHeader } from '@/ui/ModalHeader';
 import { Screen } from '@/ui/Screen';
 import { AppText } from '@/ui/Text';
 import { WeekControls } from '@/ui/WeekControls';
@@ -38,16 +39,7 @@ export default function Settings() {
 
   return (
     <Screen>
-      <View style={styles.header}>
-        <AppText variant="title" style={styles.flex}>
-          Settings
-        </AppText>
-        <Pressable accessibilityRole="button" onPress={() => router.back()} hitSlop={12}>
-          <AppText variant="small" color={colors.text}>
-            Done
-          </AppText>
-        </Pressable>
-      </View>
+      <ModalHeader title="Settings" action="Done" />
 
       <AppText variant="label">Rhythm</AppText>
       <Card style={styles.group}>
@@ -202,7 +194,6 @@ function ToggleRow({ label, value, onChange }: { label: string; value: boolean; 
 }
 
 const styles = StyleSheet.create({
-  header: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   flex: { flex: 1 },
   group: { gap: space.md },
   toggle: { flexDirection: 'row', alignItems: 'center', gap: space.md },

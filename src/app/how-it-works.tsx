@@ -1,8 +1,5 @@
-import { useRouter } from 'expo-router';
-import { Pressable, StyleSheet, View } from 'react-native';
-
-import { colors, space } from '@/theme';
 import { Card } from '@/ui/Card';
+import { ModalHeader } from '@/ui/ModalHeader';
 import { Screen } from '@/ui/Screen';
 import { AppText } from '@/ui/Text';
 
@@ -34,19 +31,9 @@ const STEPS = [
 ];
 
 export default function HowItWorks() {
-  const router = useRouter();
   return (
     <Screen>
-      <View style={styles.header}>
-        <AppText variant="title" style={styles.flex}>
-          How it works
-        </AppText>
-        <Pressable accessibilityRole="button" onPress={() => router.back()} hitSlop={12}>
-          <AppText variant="small" color={colors.text}>
-            Done
-          </AppText>
-        </Pressable>
-      </View>
+      <ModalHeader title="How it works" action="Done" />
       {STEPS.map((s, i) => (
         <Card key={s.title}>
           <AppText variant="label">Step {i + 1}</AppText>
@@ -58,7 +45,3 @@ export default function HowItWorks() {
   );
 }
 
-const styles = StyleSheet.create({
-  header: { flexDirection: 'row', alignItems: 'center', gap: space.md },
-  flex: { flex: 1 },
-});

@@ -1,6 +1,5 @@
-import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { HabitItem, HabitResult, UserData, activeHabits, addCustomHabit, archiveHabit, habitWorth, setHabitWorth } from '@/core';
 import { updateData, useStore } from '@/state/store';
@@ -9,6 +8,7 @@ import { AddActivity } from '@/ui/AddActivity';
 import { Button } from '@/ui/Button';
 import { Card } from '@/ui/Card';
 import { Divider, Stepper } from '@/ui/controls';
+import { ModalHeader } from '@/ui/ModalHeader';
 import { Screen } from '@/ui/Screen';
 import { AppText } from '@/ui/Text';
 
@@ -18,7 +18,6 @@ function worthLabel(h: HabitItem): string {
 }
 
 export default function Activities() {
-  const router = useRouter();
   const { data } = useStore();
   const [armed, setArmed] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -45,16 +44,7 @@ export default function Activities() {
 
   return (
     <Screen>
-      <View style={styles.header}>
-        <AppText variant="title" style={styles.flex}>
-          Activities
-        </AppText>
-        <Pressable accessibilityRole="button" onPress={() => router.back()} hitSlop={12}>
-          <AppText variant="small" color={colors.text}>
-            Done
-          </AppText>
-        </Pressable>
-      </View>
+      <ModalHeader title="Activities" action="Done" />
       <AppText variant="small">
         Past days keep their numbers when you change or remove something. New values apply to what you log from now on.
       </AppText>
@@ -109,8 +99,6 @@ export default function Activities() {
 }
 
 const styles = StyleSheet.create({
-  header: { flexDirection: 'row', alignItems: 'center', gap: space.md },
-  flex: { flex: 1 },
   section: { gap: space.sm },
   group: { gap: space.sm },
   item: { gap: space.sm },

@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import {
   HabitItem,
@@ -33,6 +33,7 @@ import { dayWord, fmtClock, fmtMins, greeting } from '@/ui/format';
 import { success, tap } from '@/ui/haptics';
 import { Screen } from '@/ui/Screen';
 import { AppText } from '@/ui/Text';
+import { TextButton } from '@/ui/TextButton';
 import { RecapCard } from '@/ui/today/RecapCard';
 import { WeekCard } from '@/ui/today/WeekCard';
 import { WorkList } from '@/ui/today/WorkList';
@@ -80,11 +81,7 @@ export default function Today() {
           <AppText variant="small">{now.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' })}</AppText>
           <AppText variant="title">{greeting(now)}</AppText>
         </View>
-        <Pressable accessibilityRole="button" accessibilityLabel="Settings" onPress={() => router.push('/settings')} hitSlop={10}>
-          <AppText variant="small" color={colors.text}>
-            Settings
-          </AppText>
-        </Pressable>
+        <TextButton title="Settings" onPress={() => router.push('/settings')} />
       </View>
 
       {saveFailed ? (

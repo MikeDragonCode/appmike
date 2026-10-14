@@ -1,12 +1,13 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, Share, StyleSheet, TextInput, View } from 'react-native';
+import { Share, StyleSheet, TextInput } from 'react-native';
 
 import { serializeBackup, toCsv } from '@/core';
 import { useStore } from '@/state/store';
 import { colors, radius, space } from '@/theme';
 import { Button } from '@/ui/Button';
 import { Card } from '@/ui/Card';
+import { ModalHeader } from '@/ui/ModalHeader';
 import { RestoreForm } from '@/ui/RestoreForm';
 import { Screen } from '@/ui/Screen';
 import { AppText } from '@/ui/Text';
@@ -39,16 +40,7 @@ export default function Backup() {
 
   return (
     <Screen>
-      <View style={styles.header}>
-        <AppText variant="title" style={styles.flex}>
-          Backup
-        </AppText>
-        <Pressable accessibilityRole="button" onPress={() => router.back()} hitSlop={12}>
-          <AppText variant="small" color={colors.text}>
-            Done
-          </AppText>
-        </Pressable>
-      </View>
+      <ModalHeader title="Backup" action="Done" />
 
       <AppText variant="label">Save</AppText>
       <Card style={styles.group}>
@@ -90,8 +82,6 @@ export default function Backup() {
 }
 
 const styles = StyleSheet.create({
-  header: { flexDirection: 'row', alignItems: 'center', gap: space.md },
-  flex: { flex: 1 },
   group: { gap: space.md },
   input: {
     minHeight: 96,

@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { HabitItem } from '@/core';
 import { colors, space } from '@/theme';
 import { Button } from '@/ui/Button';
@@ -6,6 +6,7 @@ import { Card } from '@/ui/Card';
 import { Divider } from '@/ui/controls';
 import { fmtMins } from '@/ui/format';
 import { AppText } from '@/ui/Text';
+import { TextButton } from '@/ui/TextButton';
 
 interface Props {
   habits: HabitItem[];
@@ -53,11 +54,7 @@ export function WorkList({ habits, loggedToday, runningHabitId, toast, onStart, 
           <AppText variant="small" color={colors.good}>
             {toast.text}
           </AppText>
-          <Pressable accessibilityRole="button" hitSlop={12} onPress={onUndo}>
-            <AppText variant="small" color={colors.text}>
-              Undo
-            </AppText>
-          </Pressable>
+          <TextButton title="Undo" onPress={onUndo} />
         </View>
       ) : null}
     </View>
