@@ -10,6 +10,7 @@ import { expireSlots } from '@/core';
 import { cancelSlotNotifications, setupNotifications, syncBankNudge, syncRoutineReminders } from '@/services/notifications';
 import { getState, loadStore, setData, useStore } from '@/state/store';
 import { colors } from '@/theme';
+import { Recovery } from '@/ui/Recovery';
 
 SplashScreen.preventAutoHideAsync().catch(() => undefined);
 setupNotifications();
@@ -81,7 +82,7 @@ function Housekeeping() {
 }
 
 export default function RootLayout() {
-  const { ready, data } = useStore();
+  const { ready, data, unreadable } = useStore();
 
   useEffect(() => {
     loadStore();
@@ -91,6 +92,14 @@ export default function RootLayout() {
   }, [ready]);
 
   if (!ready) return null;
+  if (!data && unreadable) {
+    return (
+      <SafeAreaProvider>
+        <StatusBar style="light" />
+        <Recovery raw={unreadable} />
+      </SafeAreaProvider>
+    );
+  }
   const onboarded = Boolean(data?.onboardingComplete);
 
   return (

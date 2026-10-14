@@ -22,7 +22,9 @@ export async function onboard(page: Page, struggles: string[] = []) {
 
 // Logs minutes of Deep Work by hand (the stepper starts at 30 and moves by 5).
 export async function logDeepWork(page: Page, minutes: number) {
-  await tap(page, 'Start Deep Work');
+  // The big button says "Start Deep Work" on an empty day; later the Work list's "Start" does the same.
+  if (await page.getByText('Start Deep Work', { exact: true }).count()) await tap(page, 'Start Deep Work');
+  else await tap(page, 'Start');
   const steps = Math.round((minutes - 30) / 5);
   const label = steps >= 0 ? 'Increase Time already done' : 'Decrease Time already done';
   for (let i = 0; i < Math.abs(steps); i++) await page.getByLabel(label).click();

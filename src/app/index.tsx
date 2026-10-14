@@ -37,7 +37,7 @@ import { AppText } from '@/ui/Text';
 
 export default function Today() {
   const router = useRouter();
-  const { data, focus } = useStore();
+  const { data, focus, saveFailed } = useStore();
   const now = useNow(15_000);
   const [toast, setToast] = useState<{ text: string; habitId: string } | null>(null);
   if (!data) return null;
@@ -84,6 +84,16 @@ export default function Today() {
           </AppText>
         </Pressable>
       </View>
+
+      {saveFailed ? (
+        <Card selected tint={colors.grind}>
+          <AppText variant="label">Not saved</AppText>
+          <AppText variant="small">
+            Your latest changes could not be saved on this phone. Free up some space and keep the app open. Use Backup in
+            Settings to keep a copy.
+          </AppText>
+        </Card>
+      ) : null}
 
       <Card style={styles.bank}>
         <AppText variant="label">Rest you can book</AppText>

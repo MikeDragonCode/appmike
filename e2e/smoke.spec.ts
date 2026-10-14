@@ -235,3 +235,36 @@ test('the how-it-works guide opens from settings', async ({ page }) => {
   await page.getByText('Done', { exact: true }).last().click(); // Settings stays mounted underneath
   await expect(page.getByText('Work earns rest', { exact: true })).toBeHidden();
 });
+
+test('unreadable saved data is never silently replaced', async ({ page }) => {
+  await page.addInitScript(() => {
+    if (!localStorage.getItem('stl.data.v1.unreadable')) localStorage.setItem('stl.data.v1', '{broken');
+  });
+  await page.clock.install({ time: new Date(2026, 9, 13, 18, 30) });
+  await page.goto('/');
+  await expect(page.getByText('We could not read your saved data')).toBeVisible();
+  expect(await page.evaluate(() => localStorage.getItem('stl.data.v1.unreadable'))).toBe('{broken');
+  await tap(page, 'Start fresh');
+  await tap(page, 'Tap again to start fresh');
+  await expect(page.getByText('Begin', { exact: true })).toBeVisible();
+  // the aside copy is still there after starting fresh
+  expect(await page.evaluate(() => localStorage.getItem('stl.data.v1.unreadable'))).toBe('{broken');
+});
+
+test('a failed save is reported, and the warning goes away once saving works again', async ({ page }) => {
+  await open(page);
+  await onboard(page);
+  await page.evaluate(() => {
+    (window as unknown as { __setItem: typeof Storage.prototype.setItem }).__setItem = Storage.prototype.setItem;
+    Storage.prototype.setItem = () => {
+      throw new Error('QuotaExceededError');
+    };
+  });
+  await logDeepWork(page, 60);
+  await expect(page.getByText('Not saved', { exact: true })).toBeVisible();
+  await page.evaluate(() => {
+    Storage.prototype.setItem = (window as unknown as { __setItem: typeof Storage.prototype.setItem }).__setItem;
+  });
+  await logDeepWork(page, 30);
+  await expect(page.getByText('Not saved', { exact: true })).toHaveCount(0);
+});

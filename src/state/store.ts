@@ -13,12 +13,14 @@ interface State {
   ready: boolean;
   data: UserData | null;
   focus: Focus | null;
+  unreadable: string | null; // stored data that could not be read, kept so it can be rescued
+  saveFailed: boolean; // the last write to storage failed
 }
 
 const DATA_KEY = 'stl.data.v1';
 const FOCUS_KEY = 'stl.focus.v1';
 
-let state: State = { ready: false, data: null, focus: null };
+let state: State = { ready: false, data: null, focus: null, unreadable: null, saveFailed: false };
 const listeners = new Set<() => void>();
 
 function emit(next: State) {
@@ -26,25 +28,42 @@ function emit(next: State) {
   listeners.forEach((l) => l());
 }
 
-// Writes are chained so two quick updates cannot land out of order.
+// Writes are chained so two quick updates cannot land out of order. A failed write
+// (full storage, say) is remembered so the app can say so instead of pretending.
 let writeChain: Promise<unknown> = Promise.resolve();
 function persist(key: string, value: unknown | null) {
   writeChain = writeChain
-    .then(() => (value === null ? AsyncStorage.removeItem(key) : AsyncStorage.setItem(key, JSON.stringify(value))))
-    .catch(() => undefined);
+    .then(async () => {
+      if (value === null) await AsyncStorage.removeItem(key);
+      else await AsyncStorage.setItem(key, JSON.stringify(value));
+      if (state.saveFailed) emit({ ...state, saveFailed: false });
+    })
+    .catch(() => {
+      if (!state.saveFailed) emit({ ...state, saveFailed: true });
+    });
 }
 
 export async function loadStore(): Promise<void> {
   let data: UserData | null = null;
   let focus: Focus | null = null;
+  let unreadable: string | null = null;
+  let raw: string | null = null;
   try {
-    const raw = await AsyncStorage.getItem(DATA_KEY);
+    raw = await AsyncStorage.getItem(DATA_KEY);
     const parsed = raw ? JSON.parse(raw) : null;
     if (isUserData(parsed)) data = parsed;
-    // Never throw away what we cannot read: keep it aside so it can be recovered.
-    else if (raw) await AsyncStorage.setItem(`${DATA_KEY}.unreadable`, raw);
+    else if (raw) unreadable = raw;
   } catch {
-    data = null;
+    // Stored text that is not valid JSON, or storage that failed to open.
+    if (raw) unreadable = raw;
+  }
+  if (unreadable) {
+    // Never throw away what we cannot read: keep it aside so it can be recovered.
+    try {
+      await AsyncStorage.setItem(`${DATA_KEY}.unreadable`, unreadable);
+    } catch {
+      // the copy in memory is still offered on screen
+    }
   }
   try {
     const raw = await AsyncStorage.getItem(FOCUS_KEY);
@@ -53,7 +72,7 @@ export async function loadStore(): Promise<void> {
   } catch {
     focus = null;
   }
-  emit({ ready: true, data, focus });
+  emit({ ready: true, data, focus, unreadable, saveFailed: false });
 }
 
 export function getState(): State {
@@ -73,7 +92,7 @@ export function useStore(): State {
 
 // Replace the user data. Pure functions from core go through here.
 export function setData(next: UserData | null): void {
-  emit({ ...state, data: next });
+  emit({ ...state, data: next, unreadable: next ? null : state.unreadable });
   persist(DATA_KEY, next);
 }
 
@@ -87,8 +106,13 @@ export function setFocus(next: Focus | null): void {
   persist(FOCUS_KEY, next);
 }
 
+// Gives up on unreadable data and starts clean. The aside copy stays in storage.
+export function discardUnreadable(): void {
+  emit({ ...state, unreadable: null });
+}
+
 export async function resetAll(): Promise<void> {
-  emit({ ready: true, data: null, focus: null });
+  emit({ ready: true, data: null, focus: null, unreadable: null, saveFailed: false });
   persist(DATA_KEY, null);
   persist(FOCUS_KEY, null);
   await writeChain;
