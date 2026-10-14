@@ -1,7 +1,8 @@
 import { ReactNode } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View, ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, space } from '@/theme';
+import { space } from '@/theme';
+import { Backdrop } from '@/ui/Backdrop';
 
 interface Props {
   children: ReactNode;
@@ -26,16 +27,27 @@ export function Screen({ children, footer, scroll = true, padTop = true, style }
     <View style={[styles.content, styles.fill, { paddingTop: top }, style]}>{children}</View>
   );
   return (
-    <KeyboardAvoidingView style={styles.root} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      {body}
-      {footer ? <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, space.lg) }]}>{footer}</View> : null}
-    </KeyboardAvoidingView>
+    <View style={styles.root}>
+      <Backdrop />
+      <KeyboardAvoidingView style={styles.fill} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        {body}
+        {footer ? <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, space.lg) }]}>{footer}</View> : null}
+      </KeyboardAvoidingView>
+      {padTop ? (
+        // Content scrolls up under the clock and battery. This repaints the wall over that strip, so cards
+        // never show their corners behind the status bar.
+        <View pointerEvents="none" style={[styles.statusStrip, { height: insets.top }]}>
+          <Backdrop />
+        </View>
+      ) : null}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.bg },
+  root: { flex: 1 },
   fill: { flex: 1 },
+  statusStrip: { position: 'absolute', top: 0, left: 0, right: 0, overflow: 'hidden' },
   content: { paddingHorizontal: space.xl, paddingBottom: space.xxl, gap: space.lg },
   footer: { paddingHorizontal: space.xl, paddingTop: space.md, gap: space.sm },
 });
