@@ -43,7 +43,8 @@
     "lint": "expo lint",
     "test": "tsx --test src/core/__tests__/*.test.ts",
     "typecheck": "tsc --noEmit && tsc --noEmit -p src/core/__tests__",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "shots": "SHOTS=1 playwright test e2e/store-shots.spec.ts"
   },
   "private": true
 }
