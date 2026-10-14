@@ -3,7 +3,8 @@ import { StyleSheet, TextInput } from 'react-native';
 
 import { BackupError, parseBackup } from '@/core';
 import { cancelAllReminders } from '@/services/notifications';
-import { setData, setFocus } from '@/state/store';
+import { endFocus } from '@/state/actions';
+import { setData } from '@/state/store';
 import { colors, radius, space } from '@/theme';
 import { Button } from './Button';
 import { AppText } from './Text';
@@ -30,7 +31,7 @@ export function RestoreForm({ onRestored, confirm = true }: { onRestored?: () =>
     if (confirm && !armed) return setArmed(true);
     // Booked reminders belong to the old data, so clear them and start from the backup.
     await cancelAllReminders();
-    setFocus(null);
+    endFocus();
     setData(r.data);
     onRestored?.();
   }

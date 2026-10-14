@@ -7,6 +7,7 @@ import { UserData, isUserData } from '@/core';
 export interface Focus {
   habitId: string;
   startedAt: string; // ISO
+  goalMins?: number; // an optional target; reaching it sends one quiet notification
 }
 
 interface State {
@@ -68,7 +69,10 @@ export async function loadStore(): Promise<void> {
   try {
     const raw = await AsyncStorage.getItem(FOCUS_KEY);
     const parsed = raw ? JSON.parse(raw) : null;
-    if (parsed && typeof parsed.habitId === 'string' && typeof parsed.startedAt === 'string') focus = parsed;
+    if (parsed && typeof parsed.habitId === 'string' && typeof parsed.startedAt === 'string') {
+      const goal = parsed.goalMins;
+      focus = { habitId: parsed.habitId, startedAt: parsed.startedAt, ...(typeof goal === 'number' && goal > 0 ? { goalMins: goal } : {}) };
+    }
   } catch {
     focus = null;
   }

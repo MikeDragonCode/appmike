@@ -3,13 +3,13 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { logWork, startFocus, undo } from '@/state/actions';
-import { setFocus, useStore } from '@/state/store';
+import { endFocus, logWork, startFocus, undo } from '@/state/actions';
+import { useStore } from '@/state/store';
 import { useNow } from '@/hooks/useNow';
 import { colors, space } from '@/theme';
 import { Button } from '@/ui/Button';
 import { Card } from '@/ui/Card';
-import { Stepper } from '@/ui/controls';
+import { Chip, Row, Stepper } from '@/ui/controls';
 import { fmtMins, fmtTimer } from '@/ui/format';
 import { success, tap } from '@/ui/haptics';
 import { ModalHeader } from '@/ui/ModalHeader';
@@ -27,6 +27,7 @@ export default function Focus() {
   const { data, focus } = useStore();
   const now = useNow(1000);
   const [manual, setManual] = useState(30);
+  const [goal, setGoal] = useState(0); // minutes, 0 = no goal
   const [result, setResult] = useState<{ minutes: number; earned: number } | null>(null);
   const [confirmDiscard, setConfirmDiscard] = useState(false);
 
@@ -97,9 +98,9 @@ export default function Focus() {
               accent={colors.grind}
               onPress={() => {
                 tap();
-                if (minutes >= 1 && record(minutes)) setFocus(null);
+                if (minutes >= 1 && record(minutes)) endFocus();
                 else {
-                  setFocus(null);
+                  endFocus();
                   router.back();
                 }
               }}
@@ -109,7 +110,7 @@ export default function Focus() {
               title={confirmDiscard ? 'Tap again to discard this session' : 'Discard'}
               onPress={() => {
                 if (!confirmDiscard) return setConfirmDiscard(true);
-                setFocus(null);
+                endFocus();
                 router.back();
               }}
             />
@@ -128,6 +129,13 @@ export default function Focus() {
           <AppText variant="body" color={colors.grind}>
             +{fmtMins(Math.floor((elapsedSec / 60) * rate))} of rest so far
           </AppText>
+          {running.goalMins ? (
+            <AppText variant="small" color={minutes >= running.goalMins ? colors.good : undefined}>
+              {minutes >= running.goalMins
+                ? 'Goal reached. Keep going or finish when you like.'
+                : `Goal ${fmtMins(running.goalMins)}, ${fmtMins(running.goalMins - minutes)} to go`}
+            </AppText>
+          ) : null}
           <AppText variant="small" center style={styles.note}>
             You can leave this screen. The timer keeps counting.
           </AppText>
@@ -147,7 +155,7 @@ export default function Focus() {
             disabled={!!otherRunning}
             onPress={() => {
               tap();
-              startFocus(habit.id);
+              startFocus(habit.id, goal || undefined);
             }}
           />
           <Button kind="secondary" title={`Log ${fmtMins(manual)} I already did`} onPress={() => record(manual)} />
@@ -166,6 +174,13 @@ export default function Focus() {
           {otherRunning.emoji} {otherRunning.name} is still running. Finish it first.
         </AppText>
       ) : null}
+      <AppText variant="label">Goal</AppText>
+      <Row>
+        {[0, 25, 45, 60].map((m) => (
+          <Chip key={m} label={m === 0 ? 'No goal' : `${m} min`} tint={colors.grind} selected={goal === m} onPress={() => setGoal(m)} />
+        ))}
+      </Row>
+      <AppText variant="small">With a goal you get one quiet notification when time is up.</AppText>
       <Stepper
         label="Time already done"
         value={`${manual} min`}

@@ -300,6 +300,19 @@ test('what scrolls up under the status bar is hidden, not shown through it', asy
   expect(after.equals(before)).toBe(true); // yet nothing of it shows there
 });
 
+test('a focus goal shows what is left and says so once it is reached', async ({ page }) => {
+  await open(page);
+  await onboard(page);
+  await tap(page, 'Start Deep Work');
+  await expect(page.getByText('With a goal you get one quiet notification when time is up.')).toBeVisible();
+  await tap(page, '25 min');
+  await tap(page, 'Start timer');
+  await expect(page.getByText('Goal 25m, 25m to go')).toBeVisible();
+  await page.reload();
+  await page.clock.fastForward(26 * 60_000);
+  await expect(page.getByText('Goal reached. Keep going or finish when you like.')).toBeVisible();
+});
+
 test('onboarding lets you add your own activity and remove it again', async ({ page }) => {
   await open(page);
   await tap(page, 'Begin');

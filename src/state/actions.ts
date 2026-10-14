@@ -14,8 +14,10 @@ import {
   addMinutes,
 } from '@/core';
 import {
+  cancelFocusEnd,
   cancelSlotNotifications,
   ensurePermission,
+  scheduleFocusEnd,
   scheduleSlotEnd,
   scheduleSlotStart,
 } from '@/services/notifications';
@@ -85,9 +87,20 @@ export async function endSlot(slotId: string, actualMins: number): Promise<Finis
   return r.outcome;
 }
 
-export function startFocus(habitId: string): void {
-  const f: Focus = { habitId, startedAt: new Date().toISOString() };
+export async function startFocus(habitId: string, goalMins?: number): Promise<void> {
+  const started = new Date();
+  const f: Focus = { habitId, startedAt: started.toISOString(), ...(goalMins ? { goalMins } : {}) };
   setFocus(f);
+  if (!goalMins) return;
+  const habit = getState().data?.habits.find((h) => h.id === habitId);
+  // The permission prompt appears only now, when the person has asked for a goal.
+  if (habit && (await ensurePermission())) await scheduleFocusEnd(habit.name, addMinutes(started, goalMins));
+}
+
+// Ends the running focus, however it ended: finished, stopped, discarded or replaced by a restore.
+export async function endFocus(): Promise<void> {
+  setFocus(null);
+  await cancelFocusEnd();
 }
 
 // Logs work time. Returns the rest minutes earned, or null if nothing was logged.

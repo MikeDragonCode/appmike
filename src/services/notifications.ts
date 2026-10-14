@@ -103,6 +103,22 @@ export async function scheduleSlotEnd(slot: Slot, habitName: string, endsAt: Dat
   }
 }
 
+const ID_FOCUS_END = 'focus-end';
+
+// One quiet nudge when a focus goal is reached. No repeats, nothing to dismiss.
+export async function scheduleFocusEnd(habitName: string, endsAt: Date): Promise<void> {
+  if (!(await hasPermission())) return;
+  try {
+    await scheduleAt(ID_FOCUS_END, 'Goal reached', `${habitName}: you got there. Keep going or finish when you like.`, endsAt);
+  } catch {
+    // best effort
+  }
+}
+
+export async function cancelFocusEnd(): Promise<void> {
+  await cancel(ID_FOCUS_END);
+}
+
 export async function cancelSlotNotifications(slotId: string): Promise<void> {
   await cancel(slotStartId(slotId));
   await cancel(slotEndId(slotId));
