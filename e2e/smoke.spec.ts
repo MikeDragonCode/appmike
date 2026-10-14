@@ -277,3 +277,38 @@ test('Close the day is reachable on the first screen, without scrolling', async 
   await tap(page, 'Close the day');
   await expect(page.getByText('First thing tomorrow')).toBeVisible();
 });
+
+test('onboarding lets you add your own activity and remove it again', async ({ page }) => {
+  await open(page);
+  await tap(page, 'Begin');
+  await tap(page, 'Continue');
+  await tap(page, 'Continue'); // work step
+  await page.getByLabel('Your own work activity').fill('Writing');
+  await page.getByRole('button', { name: 'Add', exact: true }).click();
+  await expect(page.getByText('🔥 Writing', { exact: true })).toBeVisible();
+  await expect(page.getByText('4 selected. Tap a custom one to remove it.')).toBeVisible();
+  await expect(page.getByLabel('Your own work activity')).toHaveValue('');
+  await tap(page, '🔥 Writing');
+  await expect(page.getByText('🔥 Writing', { exact: true })).toHaveCount(0);
+  await tap(page, 'Continue'); // rest step
+  await page.getByLabel('Your own way to rest').fill('Bath');
+  await page.getByLabel('Emoji').fill('🛁');
+  await page.getByRole('button', { name: 'Add', exact: true }).click();
+  await expect(page.getByText('🛁 Bath', { exact: true })).toBeVisible();
+});
+
+test('activities can be added in Settings, and a duplicate name is refused', async ({ page }) => {
+  await open(page);
+  await onboard(page);
+  await tap(page, 'Settings');
+  await tap(page, 'Work and rest activities');
+  const add = page.getByRole('button', { name: 'Add', exact: true });
+  await page.getByLabel('New way to rest').fill('Reading by lamp');
+  await add.last().click();
+  await expect(page.getByText(/Reading by lamp/).first()).toBeVisible();
+  await expect(page.getByLabel('New way to rest')).toHaveValue('');
+  await page.getByLabel('New way to rest').fill('Reading by lamp');
+  await add.last().click();
+  await expect(page.getByText('You already have one with that name.')).toBeVisible();
+  await expect(page.getByLabel('New way to rest')).toHaveValue('Reading by lamp'); // kept so it can be fixed
+});

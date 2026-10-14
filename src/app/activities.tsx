@@ -1,10 +1,11 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { HabitItem, HabitResult, UserData, activeHabits, addCustomHabit, archiveHabit, habitWorth, setHabitWorth } from '@/core';
 import { updateData, useStore } from '@/state/store';
-import { colors, radius, space } from '@/theme';
+import { colors, space } from '@/theme';
+import { AddActivity } from '@/ui/AddActivity';
 import { Button } from '@/ui/Button';
 import { Card } from '@/ui/Card';
 import { Divider, Stepper } from '@/ui/controls';
@@ -97,7 +98,7 @@ export default function Activities() {
               );
             })}
           </Card>
-          <AddRow
+          <AddActivity
             placeholder={type === 'grind' ? 'New work activity' : 'New way to rest'}
             onAdd={(name, emoji) => run((d) => addCustomHabit(d, { type, name, emoji }))}
           />
@@ -107,66 +108,10 @@ export default function Activities() {
   );
 }
 
-function AddRow({ placeholder, onAdd }: { placeholder: string; onAdd: (name: string, emoji: string) => boolean }) {
-  const [name, setName] = useState('');
-  const [emoji, setEmoji] = useState('');
-  const submit = () => {
-    if (!name.trim()) return;
-    if (onAdd(name, emoji)) {
-      setName('');
-      setEmoji('');
-    }
-  };
-  return (
-    <View style={styles.add}>
-      <TextInput
-        value={emoji}
-        onChangeText={(t) => setEmoji(Array.from(t).slice(0, 2).join(''))}
-        placeholder="🙂"
-        placeholderTextColor={colors.muted}
-        style={[styles.input, styles.emoji]}
-        accessibilityLabel="Emoji"
-      />
-      <TextInput
-        value={name}
-        onChangeText={setName}
-        placeholder={placeholder}
-        placeholderTextColor={colors.muted}
-        style={[styles.input, styles.name]}
-        maxLength={30}
-        returnKeyType="done"
-        onSubmitEditing={submit}
-        accessibilityLabel={placeholder}
-      />
-      <Pressable accessibilityRole="button" onPress={submit} style={[styles.addBtn, !name.trim() ? styles.addOff : null]}>
-        <AppText variant="body" color={colors.onAccent} style={styles.addText}>
-          Add
-        </AppText>
-      </Pressable>
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   flex: { flex: 1 },
   section: { gap: space.sm },
   group: { gap: space.sm },
   item: { gap: space.sm },
-  add: { flexDirection: 'row', gap: space.sm, alignItems: 'center' },
-  input: {
-    height: 48,
-    borderRadius: radius.sm,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    color: colors.text,
-    paddingHorizontal: 12,
-    fontSize: 16,
-  },
-  emoji: { width: 56, textAlign: 'center' },
-  name: { flex: 1, minWidth: 0 },
-  addBtn: { height: 48, paddingHorizontal: 16, borderRadius: radius.sm, backgroundColor: colors.text, justifyContent: 'center' },
-  addOff: { opacity: 0.35 },
-  addText: { fontWeight: '600' },
 });
