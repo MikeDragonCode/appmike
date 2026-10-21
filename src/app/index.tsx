@@ -11,6 +11,7 @@ import {
   currentWeek,
   dateToStr,
   doneSlotsThisWeek,
+  restPace,
   dismissRecap,
   dueCheckin,
   getLog,
@@ -186,7 +187,7 @@ export default function Today() {
 
       <View style={styles.section}>
         <AppText variant="label">This week</AppText>
-        <WeekCard week={week} streak={streak} goal={goal} doneSlots={doneSlotsThisWeek(data, now)} onHistory={() => router.push('/history')} />
+        <WeekCard week={week} streak={streak} goal={goal} doneSlots={doneSlotsThisWeek(data, now)} pace={restPace(data, now)} onHistory={() => router.push('/history')} />
       </View>
 
     </Screen>

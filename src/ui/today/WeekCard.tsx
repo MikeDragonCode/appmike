@@ -1,7 +1,8 @@
 import { StyleSheet, View } from 'react-native';
-import { WeekDay } from '@/core';
+import { RestPace, WeekDay } from '@/core';
 import { colors, radius, space } from '@/theme';
 import { Card } from '@/ui/Card';
+import { fmtMins } from '@/ui/format';
 import { AppText } from '@/ui/Text';
 import { TextButton } from '@/ui/TextButton';
 
@@ -10,10 +11,11 @@ interface Props {
   streak: number;
   goal: number; // weekly rest-slot goal, 0 = none
   doneSlots: number; // rest slots completed this week
+  pace: RestPace | null; // work against rest so far this week
   onHistory: () => void;
 }
 
-export function WeekCard({ week, streak, goal, doneSlots, onHistory }: Props) {
+export function WeekCard({ week, streak, goal, doneSlots, pace, onHistory }: Props) {
   return (
     <Card>
       <View style={styles.bars}>
@@ -33,6 +35,13 @@ export function WeekCard({ week, streak, goal, doneSlots, onHistory }: Props) {
       <AppText variant="small">
         {streak > 0 ? `${streak} good ${streak === 1 ? 'day' : 'days'} in a row. A missed day does not reset it, two in a row do.` : 'No pressure. Good days add up here.'}
       </AppText>
+      {pace ? (
+        <AppText variant="small">
+          {pace.kind === 'unused'
+            ? `This week you earned ${fmtMins(pace.earned)} of rest and took ${fmtMins(pace.spent)}. Rest is part of the plan, book some.`
+            : `Work and rest are in step this week: ${fmtMins(pace.earned)} earned, ${fmtMins(pace.spent)} taken.`}
+        </AppText>
+      ) : null}
       {goal > 0 ? (
         <AppText variant="small">
           Rest taken on purpose this week: {Math.min(doneSlots, 99)} of {goal}.
