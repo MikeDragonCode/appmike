@@ -1,12 +1,13 @@
 import * as Notifications from 'expo-notifications';
-import { DarkTheme, Stack, ThemeProvider, useRouter } from 'expo-router';
+import { DefaultTheme, Stack, ThemeProvider, useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useRef } from 'react';
 import { AppState, Platform } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { expireSlots } from '@/core';
+import { expireSlots, widgetSnapshot } from '@/core';
+import { syncNative } from '@/native/widgets';
 import { cancelSlotNotifications, setupNotifications, syncBankNudge, syncRoutineReminders } from '@/services/notifications';
 import { getState, loadStore, setData, useStore } from '@/state/store';
 import { colors } from '@/theme';
@@ -16,9 +17,9 @@ SplashScreen.preventAutoHideAsync().catch(() => undefined);
 setupNotifications();
 
 const theme = {
-  ...DarkTheme,
+  ...DefaultTheme,
   colors: {
-    ...DarkTheme.colors,
+    ...DefaultTheme.colors,
     background: colors.bg,
     card: colors.bg,
     text: colors.text,
@@ -54,6 +55,17 @@ function RemindersSync() {
     if (data) syncBankNudge(data);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bankKey]);
+  return null;
+}
+
+// Keeps the home screen widget and the focus Live Activity in line with the app. Only talks to the
+// native side when what they would show has actually changed.
+function NativeSync() {
+  const { data, focus } = useStore();
+  const key = data ? JSON.stringify(widgetSnapshot(data, focus)) : '';
+  useEffect(() => {
+    if (key) syncNative(JSON.parse(key));
+  }, [key]);
   return null;
 }
 
@@ -109,6 +121,7 @@ export default function RootLayout() {
         {Platform.OS !== 'web' && onboarded ? <NotificationRouter /> : null}
         {onboarded ? <RemindersSync /> : null}
         {onboarded ? <Housekeeping /> : null}
+        {onboarded && Platform.OS === 'ios' ? <NativeSync /> : null}
         <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}>
           <Stack.Protected guard={!onboarded}>
             <Stack.Screen name="onboarding" options={{ gestureEnabled: false }} />

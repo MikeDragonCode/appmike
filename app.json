@@ -44,6 +44,26 @@
         {
           "color": "#f08a24"
         }
+      ],
+      [
+        "expo-widgets",
+        {
+          "bundleIdentifier": "com.mikedragoncode.shifttolife.widgets",
+          "widgets": [
+            {
+              "name": "RestWidget",
+              "displayName": "Rest to book",
+              "description": "The rest you have earned and can book.",
+              "ios": {
+                "supportedFamilies": [
+                  "systemSmall",
+                  "systemMedium",
+                  "accessoryRectangular"
+                ]
+              }
+            }
+          ]
+        }
       ]
     ],
     "experiments": {
