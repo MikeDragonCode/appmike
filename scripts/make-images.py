@@ -13,26 +13,27 @@ from PIL import Image, ImageDraw
 
 OUT = Path(__file__).resolve().parent.parent / 'assets' / 'images'
 
-# Keep in step with src/theme.ts and app.json.
-BG = (0xfb, 0xf8, 0xf5)
-ORANGE = (0xe8, 0x70, 0x2a)  # work
-APRICOT = (0xf2, 0xab, 0x80)  # rest
-HERO_TOP = (0xa8, 0x36, 0x14)  # deep orange, darkest where the small text sits
-HERO_BOTTOM = (0xcf, 0x53, 0x1d)
-ORB = (0xe8, 0x70, 0x2a)
+# Keep in step with src/theme.ts and app.json. Every colour here was sampled from the reference pictures.
+BG = (0xe5, 0xe5, 0xe0)
+CREAM = (0xe4, 0xdf, 0xcc)
+ORANGE = (0xeb, 0x71, 0x2e)  # work
+AMBER = (0xf0, 0xb8, 0x46)  # rest
+RED = (0xd1, 0x2d, 0x20)
+DEEP = (0xd8, 0x5f, 0x29)  # the orange at the foot of the hero card
 
-# Two orbs on a screen-shaped canvas (fractions of its width and height). A big one rising off the top right, a small
-# one at the bottom left. `lit` moves the brightest point inside the orb, which is what makes it look round.
+# Two orbs on a screen-shaped canvas (fractions of its width and height). A big orange one rising off the top right, a
+# smaller amber one at the bottom left. `lit` moves the brightest point inside the orb, which is what makes it look round.
 ORBS = [
-    dict(cx=0.88, cy=0.10, r=0.56, strength=0.52, lit=(-0.32, 0.36)),
-    dict(cx=0.00, cy=0.94, r=0.40, strength=0.44, lit=(0.30, -0.32)),
+    dict(cx=0.88, cy=0.10, r=0.56, strength=0.62, lit=(-0.32, 0.36), color=ORANGE),
+    dict(cx=0.00, cy=0.94, r=0.42, strength=0.62, lit=(0.30, -0.32), color=AMBER),
 ]
 ASPECT = 0.46  # width / height of the canvas, about a modern phone
 
 
-def orb_alpha(x, y, aspect: float = ASPECT):
-    """Soft orbs over the canvas at (x, y), both given as fractions. Lower on the edge, brightest near `lit`."""
+def orbs_layer(x, y, aspect: float = ASPECT):
+    """Soft orbs over the canvas at (x, y), both given as fractions: the opacity and the colour at each point."""
     total = np.zeros_like(x)
+    colour = np.zeros(x.shape + (3,))
     for o in ORBS:
         dx = (x - o['cx']) / o['r']
         dy = (y - o['cy']) / (o['r'] * aspect)
@@ -41,18 +42,21 @@ def orb_alpha(x, y, aspect: float = ASPECT):
         lit = np.sqrt((dx - lx) ** 2 + (dy - ly) ** 2) / 1.1
         body = np.clip(1 - d, 0, 1) ** 0.8  # soft edge, no hard line
         core = np.clip(1 - lit, 0, 1) ** 1.4
-        total = np.maximum(total, o['strength'] * body * (0.35 + 0.65 * core))
-    return np.clip(total, 0, 1)
+        a = o['strength'] * body * (0.35 + 0.65 * core)
+        colour += a[..., None] * np.array(o['color'], dtype=np.float64)
+        total += a
+    total_safe = np.where(total > 1e-6, total, 1.0)
+    return np.clip(total, 0, 1), colour / total_safe[..., None]
 
 
 def orbs_png(path: Path) -> None:
     """The orbs, as a transparent PNG the size of a screen. Stretched over the whole screen behind everything."""
     w, h = 460, 1000
     y, x = np.mgrid[0:h, 0:w].astype(np.float64)
-    a = orb_alpha((x + 0.5) / w, (y + 0.5) / h)
+    a, rgb = orbs_layer((x + 0.5) / w, (y + 0.5) / h)
     a = np.clip(a + (np.random.default_rng(3).random((h, w)) - 0.5) * (3.0 / 255), 0, 1)  # no 8-bit bands
     rgba = np.zeros((h, w, 4), dtype=np.uint8)
-    rgba[..., 0], rgba[..., 1], rgba[..., 2] = ORB
+    rgba[..., :3] = np.round(rgb).astype(np.uint8)
     rgba[..., 3] = np.round(a * 255).astype(np.uint8)
     Image.fromarray(rgba, 'RGBA').save(path)
 
@@ -63,8 +67,8 @@ def fade_png(path: Path) -> None:
     w, h = 256, 32
     just_below_status_bar = 0.075  # of the screen height
     x = (np.arange(w) + 0.5) / w
-    a = orb_alpha(x, np.full_like(x, just_below_status_bar))
-    wall = np.array(BG, dtype=np.float64) * (1 - a[:, None]) + np.array(ORB, dtype=np.float64) * a[:, None]
+    a, rgb = orbs_layer(x, np.full_like(x, just_below_status_bar))
+    wall = np.array(BG, dtype=np.float64) * (1 - a[:, None]) + rgb * a[:, None]
     t = (np.arange(h) + 0.5) / h
     opacity = 1 - t * t * (3 - 2 * t)  # smoothstep, so it eases in and out
     rgba = np.zeros((h, w, 4), dtype=np.uint8)
@@ -73,16 +77,20 @@ def fade_png(path: Path) -> None:
     Image.fromarray(rgba, 'RGBA').save(path)
 
 
+def red_to_orange(x, y):
+    """Red in the top left corner running into orange, with an orange glow in the top right: the hero card and the icon."""
+    t = np.clip(x * 0.3 + y * 0.7, 0, 1)[..., None]
+    rgb = np.array(RED, dtype=np.float64) * (1 - t) + np.array(DEEP, dtype=np.float64) * t
+    d = np.sqrt((x - 0.98) ** 2 + (y - 0.1) ** 2) / 0.7
+    glow = (np.clip(1 - d, 0, 1) ** 1.5 * 0.55)[..., None]
+    return rgb * (1 - glow) + np.array(ORANGE, dtype=np.float64) * glow
+
+
 def hero_png(path: Path) -> None:
-    """The deep orange of the hero card: darker at the top, where the small text is, with a soft light orb in the corner."""
+    """The deep red-orange of the hero card."""
     w, h = 256, 256
     y, x = np.mgrid[0:h, 0:w].astype(np.float64)
-    x, y = (x + 0.5) / w, (y + 0.5) / h
-    top, bottom = np.array(HERO_TOP, dtype=np.float64), np.array(HERO_BOTTOM, dtype=np.float64)
-    rgb = top * (1 - y[..., None]) + bottom * y[..., None]
-    d = np.sqrt((x - 0.95) ** 2 + (y - 0.15) ** 2) / 0.65
-    glow = np.clip(1 - d, 0, 1) ** 1.6 * 0.38
-    rgb = rgb * (1 - glow[..., None]) + np.array((0xf0, 0x8a, 0x45), dtype=np.float64) * glow[..., None]
+    rgb = red_to_orange((x + 0.5) / w, (y + 0.5) / h)
     rgb += (np.random.default_rng(4).random((h, w, 1)) - 0.5) * 1.5
     Image.fromarray(np.clip(np.round(rgb), 0, 255).astype(np.uint8), 'RGB').save(path)
 
@@ -117,28 +125,22 @@ def arcs(size: int, background, left, right, scale: float = 1.0) -> Image.Image:
 
 
 def orange_sky(size: int) -> Image.Image:
-    """The icon background: the deep orange of the hero card, with a lighter orb glowing in a corner."""
+    """The icon background: the hero card's red running into orange."""
     y, x = np.mgrid[0:size, 0:size].astype(np.float64)
-    x, y = (x + 0.5) / size, (y + 0.5) / size
-    t = np.clip((x * 0.35 + y * 0.65), 0, 1)
-    rgb = np.array(HERO_TOP, dtype=np.float64) * (1 - t[..., None]) + np.array((0xe0, 0x62, 0x22), dtype=np.float64) * t[..., None]
-    d = np.sqrt((x - 0.82) ** 2 + (y - 0.12) ** 2) / 0.8
-    glow = np.clip(1 - d, 0, 1) ** 1.5 * 0.55
-    rgb = rgb * (1 - glow[..., None]) + np.array((0xff, 0xa0, 0x5c), dtype=np.float64) * glow[..., None]
+    rgb = red_to_orange((x + 0.5) / size, (y + 0.5) / size)
     return Image.fromarray(np.clip(np.round(rgb), 0, 255).astype(np.uint8), 'RGB')
 
 
-WHITE = (255, 255, 255)
 
 if __name__ == '__main__':
     OUT.mkdir(parents=True, exist_ok=True)
     orbs_png(OUT / 'orbs.png')
     fade_png(OUT / 'fade.png')
     hero_png(OUT / 'hero.png')
-    arcs(1024, orange_sky(1024), WHITE, (0xff, 0xd2, 0xb0)).convert('RGB').save(OUT / 'icon.png')
-    arcs(400, None, ORANGE, APRICOT, 0.95).save(OUT / 'splash-icon.png')
-    arcs(48, orange_sky(48), WHITE, (0xff, 0xd2, 0xb0), 1.15).convert('RGB').save(OUT / 'favicon.png')
-    arcs(512, None, WHITE, (0xff, 0xd2, 0xb0), 0.62).save(OUT / 'android-icon-foreground.png')
+    arcs(1024, orange_sky(1024), CREAM, AMBER).convert('RGB').save(OUT / 'icon.png')
+    arcs(400, None, ORANGE, AMBER, 0.95).save(OUT / 'splash-icon.png')
+    arcs(48, orange_sky(48), CREAM, AMBER, 1.15).convert('RGB').save(OUT / 'favicon.png')
+    arcs(512, None, CREAM, AMBER, 0.62).save(OUT / 'android-icon-foreground.png')
     orange_sky(512).convert('RGBA').save(OUT / 'android-icon-background.png')
     arcs(432, None, (255, 255, 255), (255, 255, 255), 0.62).save(OUT / 'android-icon-monochrome.png')
     print('wrote', ', '.join(sorted(p.name for p in OUT.glob('*.png'))))

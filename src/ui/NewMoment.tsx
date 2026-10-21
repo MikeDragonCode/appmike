@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
 import { Moment } from '@/core';
-import { colors, space } from '@/theme';
+import { space } from '@/theme';
 import { Button } from '@/ui/Button';
 import { Card } from '@/ui/Card';
 import { success } from '@/ui/haptics';
@@ -40,7 +40,7 @@ export function NewMoment({ moment, more, onSeen }: Props) {
 }
 
 const styles = StyleSheet.create({
-  card: { backgroundColor: colors.surfaceHigh, gap: space.md },
+  card: { backgroundColor: '#f4e3d6', gap: space.md },
   row: { flexDirection: 'row', alignItems: 'center', gap: space.lg },
   emoji: { fontSize: 44 },
   text: { flex: 1, gap: 2 },

@@ -103,7 +103,7 @@ export default function Today() {
 
       <Card hero style={styles.bank}>
         <AppText variant="label" color={colors.heroMuted}>Rest you can book</AppText>
-        <AppText variant="display" color={avail < 0 ? '#ffe2cf' : colors.heroText} style={styles.bankNumber}>
+        <AppText variant="display" color={avail < 0 ? '#e4dfcc' : colors.heroText} style={styles.bankNumber}>
           {fmtMins(avail)}
         </AppText>
         <AppText variant="small" color={colors.heroMuted}>
