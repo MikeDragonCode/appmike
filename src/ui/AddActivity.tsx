@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
-import { colors, radius, space } from '@/theme';
+import { colors, fonts, radius, space } from '@/theme';
 import { AppText } from '@/ui/Text';
 
 interface Props {
@@ -66,5 +66,5 @@ const styles = StyleSheet.create({
   name: { flex: 1, minWidth: 0 },
   add: { height: 48, paddingHorizontal: 16, borderRadius: radius.sm, backgroundColor: colors.grind, justifyContent: 'center' },
   off: { opacity: 0.35 },
-  addText: { fontWeight: '600' },
+  addText: { fontFamily: fonts.medium },
 });

@@ -1,5 +1,5 @@
 import { ActivityIndicator, Pressable, StyleSheet, ViewStyle } from 'react-native';
-import { colors, radius } from '@/theme';
+import { colors, fonts, radius } from '@/theme';
 import { AppText } from './Text';
 
 interface Props {
@@ -52,5 +52,5 @@ const styles = StyleSheet.create({
   danger: { borderWidth: 1, borderColor: colors.danger },
   pressed: { opacity: 0.8 },
   off: { opacity: 0.4 },
-  text: { fontWeight: '600' },
+  text: { fontFamily: fonts.medium },
 });

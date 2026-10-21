@@ -103,7 +103,7 @@ export default function Today() {
 
       <Card hero style={styles.bank}>
         <AppText variant="label" color={colors.heroMuted}>Rest you can book</AppText>
-        <AppText variant="display" color={avail < 0 ? colors.heroText : colors.heroText} style={styles.bankNumber}>
+        <AppText variant="display" color={colors.heroText} style={styles.bankNumber}>
           {fmtMins(avail)}
         </AppText>
         <AppText variant="small" color={colors.heroMuted}>
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'flex-start', gap: space.md },
   flex: { flex: 1 },
   bank: { gap: space.sm, padding: space.xl, paddingVertical: space.xxl },
-  bankNumber: { lineHeight: 60 },
+  bankNumber: { marginVertical: -4 },
   hint: { marginTop: space.xs, marginBottom: space.sm },
   section: { gap: space.sm },
 });

@@ -1,3 +1,4 @@
+import { useFonts } from 'expo-font';
 import * as Notifications from 'expo-notifications';
 import { DefaultTheme, Stack, ThemeProvider, useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -10,7 +11,7 @@ import { expireSlots, widgetSnapshot } from '@/core';
 import { syncNative } from '@/native/widgets';
 import { cancelSlotNotifications, setupNotifications, syncBankNudge, syncRoutineReminders } from '@/services/notifications';
 import { getState, loadStore, setData, useStore } from '@/state/store';
-import { colors } from '@/theme';
+import { colors, fontFiles } from '@/theme';
 import { Recovery } from '@/ui/Recovery';
 
 SplashScreen.preventAutoHideAsync().catch(() => undefined);
@@ -95,15 +96,17 @@ function Housekeeping() {
 
 export default function RootLayout() {
   const { ready, data, unreadable } = useStore();
+  const [fontsLoaded, fontsError] = useFonts(fontFiles);
+  const fontsDone = fontsLoaded || fontsError !== null;
 
   useEffect(() => {
     loadStore();
   }, []);
   useEffect(() => {
-    if (ready) SplashScreen.hideAsync().catch(() => undefined);
-  }, [ready]);
+    if (ready && fontsDone) SplashScreen.hideAsync().catch(() => undefined);
+  }, [ready, fontsDone]);
 
-  if (!ready) return null;
+  if (!ready || !fontsDone) return null;
   if (!data && unreadable) {
     return (
       <SafeAreaProvider>

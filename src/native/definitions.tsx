@@ -23,7 +23,7 @@ export const RestWidget = createWidget('RestWidget', (props: WidgetSnapshot, env
     return (
       <VStack alignment="leading" spacing={2}>
         <Text modifiers={[font({ size: 12, weight: 'semibold' }), lineLimit(1)]}>Rest to book</Text>
-        <Text modifiers={[font({ size: 22, weight: 'bold', design: 'rounded' }), lineLimit(1)]}>{label}</Text>
+        <Text modifiers={[font({ size: 22, weight: 'light' }), lineLimit(1)]}>{label}</Text>
       </VStack>
     );
   }
@@ -53,7 +53,7 @@ export const RestWidget = createWidget('RestWidget', (props: WidgetSnapshot, env
       modifiers={[padding({ all: 14 }), frame({ maxWidth: 10000, maxHeight: 10000, alignment: 'topLeading' }), containerBackground('#d12d20', 'widget'), widgetURL('shifttolife://')]}
     >
       <Text modifiers={[font({ size: 11, weight: 'semibold' }), foregroundStyle('#ffffff'), textCase('uppercase')]}>Rest to book</Text>
-      <Text modifiers={[font({ size: 38, weight: 'bold', design: 'rounded' }), foregroundStyle('#ffffff'), lineLimit(1)]}>{label}</Text>
+      <Text modifiers={[font({ size: 38, weight: 'light' }), foregroundStyle('#ffffff'), lineLimit(1)]}>{label}</Text>
       <Spacer />
       {status}
     </VStack>
@@ -69,7 +69,7 @@ export const FocusActivity = createLiveActivity('FocusActivity', (props: FocusPr
   const goal = props.goalMins > 0;
   const date = new Date(goal ? props.startedAt + props.goalMins * 60000 : props.startedAt);
   const timer = (size: number, color: string) => (
-    <Text date={date} dateStyle="timer" modifiers={[font({ size, weight: 'bold', design: 'rounded' }), monospacedDigit(), foregroundStyle(color), lineLimit(1)]} />
+    <Text date={date} dateStyle="timer" modifiers={[font({ size, weight: 'light' }), monospacedDigit(), foregroundStyle(color), lineLimit(1)]} />
   );
   return {
     banner: (

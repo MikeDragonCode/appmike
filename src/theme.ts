@@ -1,5 +1,3 @@
-import { Platform } from 'react-native';
-
 // Design tokens. The whole app is four colors and nothing else: white, ink, orange and red. Everything lighter or softer is
 // one of those at a lower opacity. Orange is the accent (work, rest, buttons), red is only the deep hero card and small warnings.
 // scripts/make-images.py draws the icon, the orb, the hero gradient and the status bar fade from these colors; run it after changing them.
@@ -26,7 +24,18 @@ export const colors = {
 export const radius = { sm: 10, md: 20, pill: 9999 } as const;
 export const space = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32 } as const;
 
-// Large figures and titles are set in a serif, which is what gives the screens their editorial, unhurried feel.
+// Type: Inter Tight (a tight grotesque) for everything, light for the big figures, and DM Mono for the small labels.
+// The files live in assets/fonts and load in the root layout (see fontFiles). Both fonts are under the SIL Open Font License.
 export const fonts = {
-  display: Platform.select({ ios: 'Georgia', android: 'serif', default: 'Georgia, "Times New Roman", serif' }) as string,
+  light: 'InterTight_300Light',
+  regular: 'InterTight_400Regular',
+  medium: 'InterTight_500Medium',
+  mono: 'DMMono_400Regular',
+} as const;
+
+export const fontFiles = {
+  [fonts.light]: require('../assets/fonts/InterTight_300Light.ttf'),
+  [fonts.regular]: require('../assets/fonts/InterTight_400Regular.ttf'),
+  [fonts.medium]: require('../assets/fonts/InterTight_500Medium.ttf'),
+  [fonts.mono]: require('../assets/fonts/DMMono_400Regular.ttf'),
 };

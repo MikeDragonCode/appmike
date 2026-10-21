@@ -1,6 +1,6 @@
 import { StyleSheet, View } from 'react-native';
 import { RestPace, WeekDay } from '@/core';
-import { colors, radius, space } from '@/theme';
+import { colors, fonts, radius, space } from '@/theme';
 import { Card } from '@/ui/Card';
 import { fmtMins } from '@/ui/format';
 import { AppText } from '@/ui/Text';
@@ -62,6 +62,6 @@ const styles = StyleSheet.create({
   trackFuture: { backgroundColor: 'transparent', borderColor: colors.border, borderStyle: 'dashed' },
   bar: { width: '100%', backgroundColor: colors.good },
   empty: { backgroundColor: colors.border },
-  todayLabel: { fontWeight: '700' },
+  todayLabel: { fontFamily: fonts.medium },
   history: { alignSelf: 'flex-start', marginTop: space.sm },
 });

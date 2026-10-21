@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, View } from 'react-native';
-import { colors, radius, space } from '@/theme';
+import { colors, fonts, radius, space } from '@/theme';
 import { AppText } from './Text';
 
 interface ChipProps {
@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     backgroundColor: colors.surface,
   },
-  chipText: { fontWeight: '600' },
+  chipText: { fontFamily: fonts.medium },
   stepper: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space.md },
   stepLabel: { flexShrink: 1 },
   stepRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
