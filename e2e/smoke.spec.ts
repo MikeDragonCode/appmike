@@ -13,11 +13,11 @@ test('onboarding needs at least two activities of each kind', async ({ page }) =
   await tap(page, 'Begin');
   await tap(page, 'Continue');
   await tap(page, 'Continue'); // now on the work step with three picked
-  await tap(page, '💻 Deep Work');
-  await tap(page, '🏋️ Workout');
+  await tap(page, 'Deep Work');
+  await tap(page, 'Workout');
   await tap(page, 'Continue'); // only one left: the step must not advance
   await expect(page.getByText('What counts as work?')).toBeVisible();
-  await tap(page, '🚀 Side Project');
+  await tap(page, 'Side Project');
   await tap(page, 'Continue');
   await expect(page.getByText('How do you like to rest?')).toBeVisible();
 });
@@ -142,7 +142,7 @@ test('a counter tap can be undone right away', async ({ page }) => {
   await tap(page, 'Begin');
   await tap(page, 'Continue');
   await tap(page, 'Continue');
-  await tap(page, '🍳 Cook / Chores');
+  await tap(page, 'Cook / Chores');
   for (let i = 0; i < 3; i++) await tap(page, 'Continue');
   await tap(page, 'Start');
   await tap(page, '+1');
@@ -175,7 +175,7 @@ test('history lets you fix an entry and the bank follows', async ({ page }) => {
   await logDeepWork(page, 120); // 60 saved
   await tap(page, 'History');
   await expect(page.getByText('Work 2h, rest 0m')).toBeVisible();
-  for (let i = 0; i < 6; i++) await page.getByLabel('Decrease 💻 Deep Work').click();
+  for (let i = 0; i < 6; i++) await page.getByLabel('Decrease Deep Work').click();
   await expect(page.getByText('Work 1h 30m, rest 0m')).toBeVisible();
   await tap(page, 'Done');
   await expect(page.getByText('Today earned 45m, spent 0m.')).toBeVisible();
@@ -320,16 +320,15 @@ test('onboarding lets you add your own activity and remove it again', async ({ p
   await tap(page, 'Continue'); // work step
   await page.getByLabel('Your own work activity').fill('Writing');
   await page.getByRole('button', { name: 'Add', exact: true }).click();
-  await expect(page.getByText('🔥 Writing', { exact: true })).toBeVisible();
+  await expect(page.getByText('Writing', { exact: true })).toBeVisible();
   await expect(page.getByText('4 selected. Tap a custom one to remove it.')).toBeVisible();
   await expect(page.getByLabel('Your own work activity')).toHaveValue('');
-  await tap(page, '🔥 Writing');
-  await expect(page.getByText('🔥 Writing', { exact: true })).toHaveCount(0);
+  await tap(page, 'Writing');
+  await expect(page.getByText('Writing', { exact: true })).toHaveCount(0);
   await tap(page, 'Continue'); // rest step
   await page.getByLabel('Your own way to rest').fill('Bath');
-  await page.getByLabel('Emoji').fill('🛁');
   await page.getByRole('button', { name: 'Add', exact: true }).click();
-  await expect(page.getByText('🛁 Bath', { exact: true })).toBeVisible();
+  await expect(page.getByText('Bath', { exact: true })).toBeVisible();
 });
 
 test('activities can be added in Settings, and a duplicate name is refused', async ({ page }) => {

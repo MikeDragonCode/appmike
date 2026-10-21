@@ -88,8 +88,6 @@ const styles = StyleSheet.create({
     minHeight: 84,
     borderRadius: radius.md,
     backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
     color: colors.text,
     padding: space.md,
     fontSize: 16,

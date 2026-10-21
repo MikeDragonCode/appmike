@@ -65,7 +65,7 @@ export default function Activities() {
                 <View key={h.id} style={styles.item}>
                   {i > 0 ? <Divider /> : null}
                   <AppText variant="heading">
-                    {h.emoji} {h.name}
+                    {h.name}
                   </AppText>
                   <Stepper
                     label={worthLabel(h)}

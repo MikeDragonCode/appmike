@@ -52,7 +52,7 @@ export default function LogRest() {
         <ModalHeader title="Logged" onClose={() => router.back()} />
         <Card>
           <AppText variant="heading">
-            {h?.emoji} {h?.name}, {fmtMins(done.mins)}
+            {h?.name}, {fmtMins(done.mins)}
           </AppText>
           <AppText variant="body">{fmtMins(done.charged)} came out of your bank.</AppText>
           <AppText variant="small">Next time you can book it first. Either way, it is now on record.</AppText>
@@ -84,7 +84,7 @@ export default function LogRest() {
       <AppText variant="label">What</AppText>
       <Row>
         {rest.map((h) => (
-          <Chip key={h.id} label={`${h.emoji} ${h.name}`} tint={colors.glow} selected={h.id === habitId} onPress={() => setHabitId(h.id)} />
+          <Chip key={h.id} label={`${h.name}`} tint={colors.glow} selected={h.id === habitId} onPress={() => setHabitId(h.id)} />
         ))}
       </Row>
       <AppText variant="label">How long</AppText>

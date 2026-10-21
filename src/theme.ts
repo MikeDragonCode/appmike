@@ -3,8 +3,9 @@
 // scripts/make-images.py draws the icon, the orb, the hero gradient and the status bar fade from these colors; run it after changing them.
 export const colors = {
   bg: '#ffffff',
-  surface: '#ffffff', // cards: white with a thin ink line
-  surfaceHigh: 'rgba(235, 113, 46, 0.12)', // orange, faint
+  surface: 'rgba(28, 20, 16, 0.04)', // cards and chips: ink, barely there. No lines anywhere.
+  surfaceHigh: 'rgba(28, 20, 16, 0.07)', // what sits on a card
+  accentSoft: 'rgba(235, 113, 46, 0.12)', // orange, faint: selected and highlighted
   border: 'rgba(28, 20, 16, 0.12)',
   text: '#1c1410', // ink
   muted: 'rgba(28, 20, 16, 0.62)',
@@ -21,7 +22,8 @@ export const colors = {
   heroButtonText: '#d12d20',
 } as const;
 
-export const radius = { sm: 10, md: 20, pill: 9999 } as const;
+// One shape for everything: cards, buttons, chips, fields.
+export const radius = { sm: 16, md: 16, pill: 16 } as const;
 export const space = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32 } as const;
 
 // Type: Inter Tight (a tight grotesque) for everything, light for the big figures, and DM Mono for the small labels.

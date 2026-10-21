@@ -38,7 +38,7 @@ export function WorkList({ habits, loggedToday, runningHabitId, toast, onStart, 
               <View style={styles.item}>
                 <View style={styles.flex}>
                   <AppText variant="body">
-                    {h.emoji} {h.name}
+                    {h.name}
                   </AppText>
                   <AppText variant="small">
                     {h.valueType === 'duration'

@@ -119,7 +119,6 @@ export default function Onboarding() {
           intro={`Choose at least ${MIN_ACTIVITIES}. Anything that takes effort and moves your life forward.`}
           catalog={GRIND_CATALOG}
           tint={colors.grind}
-          fallbackEmoji="🔥"
           addPlaceholder="Your own work activity"
           chosen={grindIds}
           custom={customGrind}
@@ -132,7 +131,6 @@ export default function Onboarding() {
           intro={`Choose at least ${MIN_ACTIVITIES}. Be honest, nothing here is judged.`}
           catalog={GLOW_CATALOG}
           tint={colors.glow}
-          fallbackEmoji="✨"
           addPlaceholder="Your own way to rest"
           chosen={glowIds}
           custom={customGlow}

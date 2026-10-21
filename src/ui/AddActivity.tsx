@@ -9,27 +9,17 @@ interface Props {
   onAdd: (name: string, emoji: string) => boolean | void;
 }
 
-// One emoji box, one name box, one Add button. Used when picking activities at the start and in Settings.
+// One name box, one Add button. Used when picking activities at the start and in Settings.
 export function AddActivity({ placeholder, onAdd }: Props) {
   const [name, setName] = useState('');
-  const [emoji, setEmoji] = useState('');
   const ok = name.trim().length > 0;
   const submit = () => {
     if (!ok) return;
-    if (onAdd(name.trim(), emoji.trim()) === false) return;
+    if (onAdd(name.trim(), '') === false) return;
     setName('');
-    setEmoji('');
   };
   return (
     <View style={styles.row}>
-      <TextInput
-        value={emoji}
-        onChangeText={(t) => setEmoji(Array.from(t).slice(0, 2).join(''))}
-        placeholder="🙂"
-        placeholderTextColor={colors.muted}
-        style={[styles.input, styles.emoji]}
-        accessibilityLabel="Emoji"
-      />
       <TextInput
         value={name}
         onChangeText={setName}
@@ -55,14 +45,11 @@ const styles = StyleSheet.create({
   input: {
     height: 48,
     borderRadius: radius.sm,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
+    backgroundColor: colors.surfaceHigh,
     color: colors.text,
     paddingHorizontal: 12,
     fontSize: 16,
   },
-  emoji: { width: 56, textAlign: 'center' },
   name: { flex: 1, minWidth: 0 },
   add: { height: 48, paddingHorizontal: 16, borderRadius: radius.sm, backgroundColor: colors.grind, justifyContent: 'center' },
   off: { opacity: 0.35 },

@@ -15,7 +15,7 @@ export function Chip({ label, selected, onPress, tint = colors.grind }: ChipProp
       accessibilityRole="button"
       aria-selected={selected}
       onPress={onPress}
-      style={[styles.chip, selected ? { backgroundColor: tint, borderColor: tint } : null]}
+      style={[styles.chip, selected ? { backgroundColor: tint } : null]}
     >
       <AppText variant="small" color={selected ? colors.onAccent : colors.text} style={styles.chipText}>
         {label}
@@ -77,8 +77,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 12,
     borderRadius: radius.pill,
-    borderWidth: 1,
-    borderColor: colors.border,
     backgroundColor: colors.surface,
   },
   chipText: { fontFamily: fonts.medium },
@@ -95,5 +93,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   off: { opacity: 0.35 },
-  divider: { height: 1, backgroundColor: colors.border },
+  divider: { height: space.xs },
 });

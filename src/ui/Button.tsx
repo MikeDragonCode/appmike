@@ -49,7 +49,7 @@ export function Button({ title, onPress, kind = 'primary', accent, disabled, bus
 const styles = StyleSheet.create({
   base: { minHeight: 52, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 20 },
   small: { minHeight: 44, paddingHorizontal: 14, borderRadius: radius.sm },
-  danger: { borderWidth: 1, borderColor: colors.danger },
+  danger: { backgroundColor: colors.surface },
   pressed: { opacity: 0.8 },
   off: { opacity: 0.4 },
   text: { fontFamily: fonts.medium },

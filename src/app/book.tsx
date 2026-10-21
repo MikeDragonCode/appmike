@@ -109,7 +109,7 @@ export default function BookRest() {
         {rest.map((h) => (
           <Chip
             key={h.id}
-            label={`${h.emoji} ${h.name}`}
+            label={`${h.name}`}
             tint={colors.glow}
             selected={h.id === habitId}
             onPress={() => {

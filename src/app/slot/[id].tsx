@@ -71,7 +71,7 @@ export default function SlotScreen() {
         <ModalHeader title="Rest" onClose={() => router.back()} />
         <Card>
           <AppText variant="heading">
-            {habit.emoji} {habit.name}
+            {habit.name}
           </AppText>
           <AppText variant="body" style={styles.msg}>
             {msg}
@@ -163,7 +163,7 @@ export default function SlotScreen() {
       <ModalHeader title={slot.state === 'active' ? 'Resting' : 'Booked rest'} onClose={() => router.back()} />
       <View style={styles.center}>
         <AppText variant="heading">
-          {habit.emoji} {habit.name}
+          {habit.name}
         </AppText>
         {slot.state === 'active' ? (
           <>

@@ -25,23 +25,21 @@ export function NewMoment({ moment, more, onSeen }: Props) {
   return (
     <Card style={styles.card}>
       <View style={styles.row}>
-        <Animated.Text style={[styles.emoji, { transform: [{ scale: pop }] }]} accessibilityElementsHidden>
-          {moment.emoji}
-        </Animated.Text>
+        <Animated.View style={[styles.orb, { transform: [{ scale: pop }] }]} accessibilityElementsHidden />
         <View style={styles.text}>
           <AppText variant="label">New moment{more > 0 ? `, ${more} more waiting` : ''}</AppText>
           <AppText variant="heading">{moment.title}</AppText>
           <AppText variant="small">{moment.line}</AppText>
         </View>
       </View>
-      <Button small kind="secondary" title="Nice" onPress={onSeen} />
+      <Button small title="Nice" onPress={onSeen} />
     </Card>
   );
 }
 
 const styles = StyleSheet.create({
-  card: { borderColor: colors.grind, gap: space.md },
+  card: { backgroundColor: colors.accentSoft, gap: space.md },
   row: { flexDirection: 'row', alignItems: 'center', gap: space.lg },
-  emoji: { fontSize: 44 },
+  orb: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.grind },
   text: { flex: 1, gap: 2 },
 });

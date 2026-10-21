@@ -77,7 +77,7 @@ export default function Focus() {
           <AppText variant="label">Rest earned</AppText>
           <Prize earned={result.earned} seed={result.minutes} />
           <AppText variant="small">
-            {habit.emoji} {habit.name}, {fmtMins(result.minutes)}
+            {habit.name}, {fmtMins(result.minutes)}
           </AppText>
         </Card>
       </Screen>
@@ -120,7 +120,7 @@ export default function Focus() {
         <ModalHeader title="Focus" onClose={() => router.back()} />
         <View style={styles.center}>
           <AppText variant="small">
-            {habit.emoji} {habit.name}
+            {habit.name}
           </AppText>
           <AppText variant="display" style={styles.timer}>
             {fmtTimer(elapsedSec)}
@@ -164,13 +164,13 @@ export default function Focus() {
       <ModalHeader title="Focus" />
       <Card>
         <AppText variant="heading">
-          {habit.emoji} {habit.name}
+          {habit.name}
         </AppText>
         <AppText variant="small">Every hour here earns {Math.round(rate * 60)} min of rest.</AppText>
       </Card>
       {otherRunning ? (
         <AppText variant="small" color={colors.grindText}>
-          {otherRunning.emoji} {otherRunning.name} is still running. Finish it first.
+          {otherRunning.name} is still running. Finish it first.
         </AppText>
       ) : null}
       <AppText variant="label">Goal</AppText>

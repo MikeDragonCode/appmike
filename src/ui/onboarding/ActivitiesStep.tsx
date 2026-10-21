@@ -10,7 +10,6 @@ interface Props {
   intro: string;
   catalog: CatalogItem[];
   tint: string;
-  fallbackEmoji: string; // for a custom activity added without one
   addPlaceholder: string;
   chosen: string[];
   custom: CustomActivity[];
@@ -19,7 +18,7 @@ interface Props {
 }
 
 // The same step for work and for rest: pick from the catalogue, add your own, tap an own one to remove it.
-export function ActivitiesStep({ title, intro, catalog, tint, fallbackEmoji, addPlaceholder, chosen, custom, onChosen, onCustom }: Props) {
+export function ActivitiesStep({ title, intro, catalog, tint, addPlaceholder, chosen, custom, onChosen, onCustom }: Props) {
   const toggle = (id: string) => onChosen(chosen.includes(id) ? chosen.filter((x) => x !== id) : [...chosen, id]);
   return (
     <View style={styles.block}>
@@ -27,12 +26,12 @@ export function ActivitiesStep({ title, intro, catalog, tint, fallbackEmoji, add
       <AppText variant="small">{intro}</AppText>
       <Row>
         {catalog.map((i) => (
-          <Chip key={i.id} label={`${i.emoji} ${i.name}`} tint={tint} selected={chosen.includes(i.id)} onPress={() => toggle(i.id)} />
+          <Chip key={i.id} label={`${i.name}`} tint={tint} selected={chosen.includes(i.id)} onPress={() => toggle(i.id)} />
         ))}
         {custom.map((c, idx) => (
           <Chip
             key={`custom${idx}`}
-            label={`${c.emoji || fallbackEmoji} ${c.name}`}
+            label={`${c.name}`}
             tint={tint}
             selected
             onPress={() => onCustom(custom.filter((_, k) => k !== idx))}

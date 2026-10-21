@@ -1,6 +1,6 @@
 import { StyleSheet, View } from 'react-native';
 import { RestPace, WeekDay } from '@/core';
-import { colors, fonts, radius, space } from '@/theme';
+import { colors, fonts, space } from '@/theme';
 import { Card } from '@/ui/Card';
 import { fmtMins } from '@/ui/format';
 import { AppText } from '@/ui/Text';
@@ -57,11 +57,11 @@ export function WeekCard({ week, streak, goal, doneSlots, pace, onHistory }: Pro
 const styles = StyleSheet.create({
   bars: { flexDirection: 'row', justifyContent: 'space-between', gap: 6, height: 84, marginBottom: space.sm },
   col: { flex: 1, alignItems: 'center', gap: 4 },
-  track: { flex: 1, width: '100%', justifyContent: 'flex-end', backgroundColor: colors.surfaceHigh, borderRadius: radius.sm, overflow: 'hidden', borderWidth: 1, borderColor: 'transparent' },
-  trackToday: { borderColor: colors.muted },
-  trackFuture: { backgroundColor: 'transparent', borderColor: colors.border, borderStyle: 'dashed' },
+  track: { flex: 1, width: '100%', justifyContent: 'flex-end', backgroundColor: colors.surfaceHigh, borderRadius: 8, overflow: 'hidden' },
+  trackToday: { backgroundColor: colors.accentSoft },
+  trackFuture: { backgroundColor: colors.surface },
   bar: { width: '100%', backgroundColor: colors.good },
-  empty: { backgroundColor: colors.border },
+  empty: { backgroundColor: colors.surfaceHigh },
   todayLabel: { fontFamily: fonts.medium },
   history: { alignSelf: 'flex-start', marginTop: space.sm },
 });

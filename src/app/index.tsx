@@ -161,7 +161,7 @@ export default function Today() {
         <Card onPress={() => router.push({ pathname: '/slot/[id]', params: { id: next.id } })} selected tint={colors.glow}>
           <AppText variant="label">{next.state === 'active' ? 'Resting now' : 'Next rest'}</AppText>
           <AppText variant="heading">
-            {nextHabit.emoji} {nextHabit.name}
+            {nextHabit.name}
           </AppText>
           <AppText variant="small">
             {dayWord(new Date(next.startsAt), now)} {fmtClock(new Date(next.startsAt))}, {next.plannedMins} min
@@ -173,7 +173,7 @@ export default function Today() {
         <Card onPress={() => router.push({ pathname: '/focus', params: { habitId: focus.habitId } })} selected tint={colors.grind}>
           <AppText variant="label">Focus running</AppText>
           <AppText variant="heading">
-            {focusHabit.emoji} {focusHabit.name}
+            {focusHabit.name}
           </AppText>
           <AppText variant="small">Tap to open the timer.</AppText>
         </Card>

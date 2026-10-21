@@ -50,12 +50,12 @@ export default function History() {
               accessible
               accessibilityLabel={m.earned ? `${m.title}. ${m.line}` : 'Not yet'}
             >
-              <AppText variant="display" color={m.earned ? undefined : colors.border} style={styles.momentEmoji}>
-                {m.earned ? m.emoji : '·'}
-              </AppText>
-              <AppText variant="small" numberOfLines={2} style={styles.momentTitle}>
-                {m.earned ? m.title : 'Not yet'}
-              </AppText>
+              <View style={[styles.dot, m.earned ? styles.dotOn : null]} />
+              {m.earned ? (
+                <AppText variant="small" color={colors.text} numberOfLines={2} style={styles.momentTitle}>
+                  {m.title}
+                </AppText>
+              ) : null}
             </View>
           ))}
         </View>
@@ -124,7 +124,7 @@ function DayCard({
       {day.tomorrowFirst ? <AppText variant="small">Note: {day.tomorrowFirst}</AppText> : null}
       {day.entries.map((e) => {
         const counter = e.habit.valueType === 'counter';
-        const label = `${e.habit.emoji} ${e.habit.name}`;
+        const label = e.habit.name;
         return (
           <Stepper
             key={`${e.kind}-${e.habit.id}`}
@@ -141,7 +141,7 @@ function DayCard({
           {addable.map((h) => (
             <Chip
               key={h.id}
-              label={`${h.emoji} ${h.name}`}
+              label={`${h.name}`}
               tint={h.type === 'grind' ? colors.grind : colors.glow}
               selected={false}
               onPress={() => {
@@ -159,8 +159,9 @@ function DayCard({
 const styles = StyleSheet.create({
   day: { gap: space.md },
   moments: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm, marginVertical: space.sm },
-  moment: { width: '31%', alignItems: 'center', gap: 2, paddingVertical: space.sm, paddingHorizontal: 4, borderRadius: radius.sm, backgroundColor: colors.surfaceHigh },
-  locked: { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.border, borderStyle: 'dashed' },
-  momentEmoji: { fontSize: 30, lineHeight: 38, letterSpacing: 0 },
-  momentTitle: { textAlign: 'center' },
+  moment: { width: '31%', minHeight: 72, alignItems: 'flex-start', gap: space.sm, padding: space.md, borderRadius: radius.sm, backgroundColor: colors.accentSoft },
+  locked: { backgroundColor: colors.surface },
+  dot: { width: 14, height: 14, borderRadius: 7, backgroundColor: colors.surfaceHigh },
+  dotOn: { backgroundColor: colors.grind },
+  momentTitle: { textAlign: 'left' },
 });
