@@ -18,7 +18,7 @@ const STEPS = [
   },
   {
     title: 'You can borrow a little',
-    body: 'Low on rest but need a break? You may borrow a small amount ahead. Your next focus block pays it back. The limit is in Settings.',
+    body: 'Low on rest but need a break? You may borrow a small amount ahead. The next focus block squares it up. The limit is in Settings.',
   },
   {
     title: 'Rest days are lighter',

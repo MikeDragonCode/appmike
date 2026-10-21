@@ -51,18 +51,18 @@ export function todayHint(data: UserData, now: Date): { kind: HintKind; text: st
   const active = worked || (log?.glowLogs.length ?? 0) > 0;
 
   if (avail < 0) {
-    return { kind: 'debt', text: `You borrowed ${-avail} min of rest ahead. Your next focus block pays it back.` };
+    return { kind: 'debt', text: `You are ${-avail} min ahead on rest. Fine by me. The next focus block squares it up.` };
   }
   if (avail >= data.profile.defaultSlotMins && !nextOpenSlot(data)) {
-    return { kind: 'book', text: `You have ${avail} min of rest saved. Book it so it actually happens.` };
+    return { kind: 'book', text: `You have ${avail} min of rest saved. Pick a time and make it real.` };
   }
   // Only ask to close a day that had something in it.
   if (!closed && afterWork && active) {
-    return { kind: 'close', text: 'The workday is over. Close it when you are ready.' };
+    return { kind: 'close', text: 'The workday is over. Close it with a tick when you are ready.' };
   }
-  if (closed) return { kind: 'closed', text: 'Day closed. Rest well.' };
+  if (closed) return { kind: 'closed', text: 'Day closed. Go enjoy your evening.' };
   if (!worked && !isRestDay(data, now)) {
     return { kind: 'start', text: 'Start with one focus block. The rest follows.' };
   }
-  return { kind: 'idle', text: 'You are on track.' };
+  return { kind: 'idle', text: 'Looking good. Keep your pace.' };
 }

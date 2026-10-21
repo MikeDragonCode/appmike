@@ -149,7 +149,7 @@ export async function syncRoutineReminders(profile: Profile): Promise<void> {
         identifier: ID_WIND_DOWN,
         content: {
           title: 'Wind down',
-          body: `Bedtime is ${formatHM(parseHM(profile.bedtime))}. Start slowing the evening.`,
+          body: `Bedtime is at ${formatHM(parseHM(profile.bedtime))}. Slow down and let the day go.`,
         },
         trigger: { type: Notifications.SchedulableTriggerInputTypes.DAILY, ...t, channelId: CHANNEL },
       });
@@ -174,7 +174,7 @@ export async function syncBankNudge(data: UserData): Promise<void> {
     await scheduleAt(
       ID_BANK,
       'Rest is waiting',
-      `You have ${Math.floor(pile)} min of rest saved. Book a slot so it actually happens.`,
+      `${Math.floor(pile)} min of rest are waiting for you. Pick a time and enjoy them.`,
       at,
     );
   } catch {

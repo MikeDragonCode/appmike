@@ -50,7 +50,7 @@ export default function History() {
               accessible
               accessibilityLabel={m.earned ? `${m.title}. ${m.line}` : 'Not yet'}
             >
-              <AppText variant="display" color={colors.border} style={styles.momentEmoji}>
+              <AppText variant="display" color={m.earned ? undefined : colors.border} style={styles.momentEmoji}>
                 {m.earned ? m.emoji : '·'}
               </AppText>
               <AppText variant="small" numberOfLines={2} style={styles.momentTitle}>

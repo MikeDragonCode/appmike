@@ -27,7 +27,7 @@ export default function CloseDay() {
       <Screen padTop={false} footer={<Button title="Done" onPress={() => router.back()} />}>
         <ModalHeader title="Day closed" onClose={() => router.back()} />
         <Card>
-          <AppText variant="body">Nothing else to carry tonight.</AppText>
+          <AppText variant="body">Nothing left to carry tonight. 🌙</AppText>
           {note.trim() ? (
             <AppText variant="small">Tomorrow you start with: {note.trim()}</AppText>
           ) : null}

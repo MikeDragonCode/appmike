@@ -11,7 +11,7 @@ import { Button } from '@/ui/Button';
 import { Card } from '@/ui/Card';
 import { Chip, Row, Stepper } from '@/ui/controls';
 import { dayWord, fmtClock, fmtMins } from '@/ui/format';
-import { tap } from '@/ui/haptics';
+import { success, tap } from '@/ui/haptics';
 import { ModalHeader } from '@/ui/ModalHeader';
 import { Screen } from '@/ui/Screen';
 import { AppText } from '@/ui/Text';
@@ -66,6 +66,7 @@ export default function BookRest() {
       setBusy(false);
       return;
     }
+    success();
     if (r.startedNow) router.replace({ pathname: '/slot/[id]', params: { id: r.slot.id } });
     else router.back();
   }
@@ -193,7 +194,7 @@ export default function BookRest() {
         </View>
         {left < 0 && preview.ok ? (
           <AppText variant="small" color={colors.grindText}>
-            You would borrow {fmtMins(-left)} ahead. Work pays it back.
+            You would be {fmtMins(-left)} ahead on rest. The next focus block squares it up.
           </AppText>
         ) : null}
       </Card>
