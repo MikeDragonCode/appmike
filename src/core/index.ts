@@ -17,3 +17,4 @@ export * from './plan';
 export * from './week';
 export * from './pace';
 export * from './rhythm';
+export * from './moments';

@@ -434,3 +434,19 @@ test('Book rest shows which "When" choice is picked, and drops it after a hand-m
   await expect(chip('In 1 hour')).toHaveAttribute('aria-selected', 'false');
   await expect(chip('Now')).toHaveAttribute('aria-selected', 'false');
 });
+
+test('a first focus block earns a moment that shows once and stays in the collection', async ({ page }) => {
+  await open(page);
+  await onboard(page);
+  await expect(page.getByText('First spark')).toHaveCount(0);
+  await logDeepWork(page, 30);
+  await expect(page.getByText('First spark')).toBeVisible();
+  await tap(page, 'Nice');
+  await expect(page.getByText('First spark')).toHaveCount(0);
+  await page.reload();
+  await expect(page.getByText('Good evening')).toBeVisible();
+  await expect(page.getByText('First spark')).toHaveCount(0);
+  await tap(page, 'History');
+  await expect(page.getByText('Moments, 1 of 10')).toBeVisible();
+  await expect(page.getByText('First spark')).toBeVisible();
+});

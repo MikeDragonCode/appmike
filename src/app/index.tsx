@@ -18,8 +18,10 @@ import {
   getSoftStreak,
   isRestDay,
   logGrind,
+  newMoments,
   nextOpenSlot,
   reservedMins,
+  seeMoment,
   summarizeDay,
   todayHint,
   weeklyRecap,
@@ -30,6 +32,7 @@ import { useNow } from '@/hooks/useNow';
 import { colors, space } from '@/theme';
 import { Button } from '@/ui/Button';
 import { Card } from '@/ui/Card';
+import { NewMoment } from '@/ui/NewMoment';
 import { dayWord, fmtClock, fmtMins, greeting } from '@/ui/format';
 import { success, tap } from '@/ui/haptics';
 import { Screen } from '@/ui/Screen';
@@ -61,6 +64,7 @@ export default function Today() {
   const firstTask = summarizeDay(data, yesterday).tomorrowFirst;
   const checkin = dueCheckin(data, now);
   const recap = weeklyRecap(data, now);
+  const moments = newMoments(data);
   const streak = getSoftStreak(data, now);
   const goal = data.profile.weeklySlotGoal;
   const week = currentWeek(data, now);
@@ -131,6 +135,10 @@ export default function Today() {
           <Button small kind="ghost" title="Close the day" onPress={() => router.push('/close-day')} />
         ) : null}
       </Card>
+
+      {moments.length > 0 ? (
+        <NewMoment moment={moments[0]} more={moments.length - 1} onSeen={() => updateData((d) => seeMoment(d, moments[0].id))} />
+      ) : null}
 
       {checkin ? (
         <Card onPress={() => router.push('/checkin')}>

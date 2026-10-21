@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
-import { HistoryDay, activeHabits, bestWindow, listDays, setLogEntry } from '@/core';
+import { HistoryDay, activeHabits, allMoments, bestWindow, listDays, setLogEntry } from '@/core';
 import { updateData, useStore } from '@/state/store';
-import { colors, space } from '@/theme';
+import { colors, radius, space } from '@/theme';
 import { Card } from '@/ui/Card';
 import { Chip, Row, Stepper } from '@/ui/controls';
 import { dayWord, fmtMins } from '@/ui/format';
@@ -22,6 +22,8 @@ export default function History() {
   const days = listDays(data, 30);
   const now = new Date();
   const window = bestWindow(data);
+  const moments = allMoments(data);
+  const got = moments.filter((m) => m.earned).length;
 
   const set = (date: string, habitId: string, value: number) =>
     updateData((d) => {
@@ -35,6 +37,30 @@ export default function History() {
       <AppText variant="small">
         Fix what you logged, or add something you forgot. Changes move your bank by the difference only.
       </AppText>
+
+      <Card>
+        <AppText variant="label">
+          Moments, {got} of {moments.length}
+        </AppText>
+        <View style={styles.moments}>
+          {moments.map((m) => (
+            <View
+              key={m.id}
+              style={[styles.moment, m.earned ? null : styles.locked]}
+              accessible
+              accessibilityLabel={m.earned ? `${m.title}. ${m.line}` : 'Not yet'}
+            >
+              <AppText variant="display" color={colors.border} style={styles.momentEmoji}>
+                {m.earned ? m.emoji : '·'}
+              </AppText>
+              <AppText variant="small" numberOfLines={2} style={styles.momentTitle}>
+                {m.earned ? m.title : 'Not yet'}
+              </AppText>
+            </View>
+          ))}
+        </View>
+        <AppText variant="small">They only ever get added. Nothing here resets.</AppText>
+      </Card>
 
       {window ? (
         <Card>
@@ -132,4 +158,9 @@ function DayCard({
 
 const styles = StyleSheet.create({
   day: { gap: space.md },
+  moments: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm, marginVertical: space.sm },
+  moment: { width: '31%', alignItems: 'center', gap: 2, paddingVertical: space.sm, paddingHorizontal: 4, borderRadius: radius.sm, backgroundColor: colors.surfaceHigh },
+  locked: { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.border, borderStyle: 'dashed' },
+  momentEmoji: { fontSize: 30, lineHeight: 38, letterSpacing: 0 },
+  momentTitle: { textAlign: 'center' },
 });

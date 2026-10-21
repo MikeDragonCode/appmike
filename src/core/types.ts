@@ -74,6 +74,7 @@ export interface UserData {
   profile: Profile;
   slots: Slot[];
   workByHour?: number[]; // minutes of timed focus by hour of day, 24 entries
+  momentsSeen?: string[]; // ids of moments already shown
   lastRecapDate?: string;
   checkinsDone?: number[]; // follow-up stages already answered or dismissed (3, 7, 14)
 }

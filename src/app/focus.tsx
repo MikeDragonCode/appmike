@@ -13,6 +13,7 @@ import { Chip, Row, Stepper } from '@/ui/controls';
 import { fmtMins, fmtTimer } from '@/ui/format';
 import { success, tap } from '@/ui/haptics';
 import { ModalHeader } from '@/ui/ModalHeader';
+import { Prize } from '@/ui/Prize';
 import { Screen } from '@/ui/Screen';
 import { AppText } from '@/ui/Text';
 
@@ -74,9 +75,7 @@ export default function Focus() {
         <ModalHeader title="Nice work" onClose={() => router.back()} />
         <Card>
           <AppText variant="label">Rest earned</AppText>
-          <AppText variant="display" color={colors.goodText}>
-            +{fmtMins(result.earned)}
-          </AppText>
+          <Prize earned={result.earned} seed={result.minutes} />
           <AppText variant="small">
             {habit.emoji} {habit.name}, {fmtMins(result.minutes)}
           </AppText>
