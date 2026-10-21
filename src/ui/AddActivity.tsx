@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
   },
   emoji: { width: 56, textAlign: 'center' },
   name: { flex: 1, minWidth: 0 },
-  add: { height: 48, paddingHorizontal: 16, borderRadius: radius.sm, backgroundColor: colors.text, justifyContent: 'center' },
+  add: { height: 48, paddingHorizontal: 16, borderRadius: radius.sm, backgroundColor: colors.grind, justifyContent: 'center' },
   off: { opacity: 0.35 },
   addText: { fontWeight: '600' },
 });

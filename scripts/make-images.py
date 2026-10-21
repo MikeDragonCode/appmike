@@ -13,11 +13,11 @@ from PIL import Image, ImageDraw
 OUT = Path(__file__).resolve().parent.parent / 'assets' / 'images'
 
 # Keep in step with src/theme.ts and app.json.
-BG = (0x2a, 0x23, 0x1d)
-AMBER = (0xf0, 0xb2, 0x66)
-SAGE = (0xb4, 0xc9, 0xa2)
-LAMP = (255, 201, 138)  # colour of the light
-LAMP_STRENGTH = 0.16  # how strongly the light lifts the wall at its brightest
+BG = (0xff, 0xf8, 0xef)
+AMBER = (0xf0, 0x8a, 0x24)  # work orange
+SAGE = (0x5b, 0xb8, 0xa0)  # rest green
+LAMP = (255, 176, 96)  # colour of the sun light
+LAMP_STRENGTH = 0.38  # how strongly the light tints the wall at its brightest
 
 
 def falloff(x, y, cx: float, cy: float, rx: float, ry: float, strength: float):

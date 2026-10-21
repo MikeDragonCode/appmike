@@ -156,5 +156,5 @@ const styles = StyleSheet.create({
   block: { gap: space.md },
   dots: { flexDirection: 'row', gap: 6 },
   dot: { flex: 1, height: 4, borderRadius: 2, backgroundColor: colors.border },
-  dotOn: { backgroundColor: colors.text },
+  dotOn: { backgroundColor: colors.grind },
 });

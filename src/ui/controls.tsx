@@ -9,7 +9,7 @@ interface ChipProps {
   tint?: string;
 }
 
-export function Chip({ label, selected, onPress, tint = colors.text }: ChipProps) {
+export function Chip({ label, selected, onPress, tint = colors.grind }: ChipProps) {
   return (
     <Pressable
       accessibilityRole="button"

@@ -95,7 +95,7 @@ export default function RootLayout() {
   if (!data && unreadable) {
     return (
       <SafeAreaProvider>
-        <StatusBar style="light" />
+        <StatusBar style="dark" />
         <Recovery raw={unreadable} />
       </SafeAreaProvider>
     );
@@ -105,7 +105,7 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <ThemeProvider value={theme}>
-        <StatusBar style="light" />
+        <StatusBar style="dark" />
         {Platform.OS !== 'web' && onboarded ? <NotificationRouter /> : null}
         {onboarded ? <RemindersSync /> : null}
         {onboarded ? <Housekeeping /> : null}

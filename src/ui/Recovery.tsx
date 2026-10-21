@@ -43,7 +43,7 @@ export function Recovery({ raw }: { raw: string }) {
         <AppText variant="label">Keep the damaged copy</AppText>
         <Button kind="secondary" title="Share the damaged copy" onPress={share} />
         {note ? (
-          <AppText variant="small" color={colors.grind}>
+          <AppText variant="small" color={colors.grindText}>
             {note}
           </AppText>
         ) : null}

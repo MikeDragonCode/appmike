@@ -51,7 +51,7 @@ export function WorkList({ habits, loggedToday, runningHabitId, toast, onStart, 
       </Card>
       {toast ? (
         <View style={styles.toast}>
-          <AppText variant="small" color={colors.good}>
+          <AppText variant="small" color={colors.goodText}>
             {toast.text}
           </AppText>
           <TextButton title="Undo" onPress={onUndo} />

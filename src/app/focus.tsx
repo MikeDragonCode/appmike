@@ -74,7 +74,7 @@ export default function Focus() {
         <ModalHeader title="Nice work" onClose={() => router.back()} />
         <Card>
           <AppText variant="label">Rest earned</AppText>
-          <AppText variant="display" color={colors.good}>
+          <AppText variant="display" color={colors.goodText}>
             +{fmtMins(result.earned)}
           </AppText>
           <AppText variant="small">
@@ -126,11 +126,11 @@ export default function Focus() {
           <AppText variant="display" style={styles.timer}>
             {fmtTimer(elapsedSec)}
           </AppText>
-          <AppText variant="body" color={colors.grind}>
+          <AppText variant="body" color={colors.grindText}>
             +{fmtMins(Math.floor((elapsedSec / 60) * rate))} of rest so far
           </AppText>
           {running.goalMins ? (
-            <AppText variant="small" color={minutes >= running.goalMins ? colors.good : undefined}>
+            <AppText variant="small" color={minutes >= running.goalMins ? colors.goodText : undefined}>
               {minutes >= running.goalMins
                 ? 'Goal reached. Keep going or finish when you like.'
                 : `Goal ${fmtMins(running.goalMins)}, ${fmtMins(running.goalMins - minutes)} to go`}
@@ -170,7 +170,7 @@ export default function Focus() {
         <AppText variant="small">Every hour here earns {Math.round(rate * 60)} min of rest.</AppText>
       </Card>
       {otherRunning ? (
-        <AppText variant="small" color={colors.grind}>
+        <AppText variant="small" color={colors.grindText}>
           {otherRunning.emoji} {otherRunning.name} is still running. Finish it first.
         </AppText>
       ) : null}

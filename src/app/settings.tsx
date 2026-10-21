@@ -130,7 +130,7 @@ export default function Settings() {
         <ToggleRow label="Nudge when rest piles up" value={p.remindBank} onChange={(v) => setReminder('remindBank', v)} />
         {notifNote ? (
           <>
-            <AppText variant="small" color={colors.grind}>
+            <AppText variant="small" color={colors.grindText}>
               {notifNote}
             </AppText>
             {Platform.OS !== 'web' ? (
@@ -186,7 +186,7 @@ function ToggleRow({ label, value, onChange }: { label: string; value: boolean; 
         value={value}
         onValueChange={onChange}
         trackColor={{ false: colors.border, true: colors.good }}
-        thumbColor={colors.text}
+        thumbColor="#ffffff"
         accessibilityLabel={label}
       />
     </View>

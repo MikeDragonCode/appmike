@@ -49,7 +49,7 @@ export default function Backup() {
         </AppText>
         <Button title="Share backup" onPress={share} />
         {shareNote ? (
-          <AppText variant="small" color={colors.grind}>
+          <AppText variant="small" color={colors.grindText}>
             {shareNote}
           </AppText>
         ) : null}

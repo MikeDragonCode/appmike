@@ -15,7 +15,7 @@ interface Props {
 
 export function Button({ title, onPress, kind = 'primary', accent, disabled, busy, small, style }: Props) {
   const off = disabled || busy;
-  const fill = kind === 'primary' ? (accent ?? colors.text) : kind === 'secondary' ? colors.surfaceHigh : 'transparent';
+  const fill = kind === 'primary' ? (accent ?? colors.grind) : kind === 'secondary' ? colors.surfaceHigh : 'transparent';
   const textColor = kind === 'primary' ? colors.onAccent : kind === 'danger' ? colors.danger : colors.text;
   return (
     <Pressable

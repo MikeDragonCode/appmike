@@ -123,7 +123,7 @@ export default function Today() {
             onPress={() => router.push({ pathname: '/focus', params: { habitId: firstFocus.id } })}
           />
         ) : (
-          <Button title="Book rest" kind={mainKind} accent={colors.glow} onPress={() => router.push('/book')} />
+          <Button title="Book rest" kind={mainKind} onPress={() => router.push('/book')} />
         )}
         <Button small kind="ghost" title="Log rest I already took" onPress={() => router.push('/log-rest')} />
         {hint.kind !== 'close' && !day.closed ? (

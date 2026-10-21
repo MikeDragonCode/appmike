@@ -67,7 +67,7 @@ export default function LogRest() {
       footer={
         <Button
           title="Log rest"
-          accent={colors.glow}
+         
           disabled={!habit}
           onPress={() => {
             tap();

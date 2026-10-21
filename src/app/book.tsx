@@ -86,7 +86,7 @@ export default function BookRest() {
           ) : null}
           <Button
             title={startsAt === null ? 'Start now' : 'Book it'}
-            accent={colors.glow}
+           
             onPress={confirm}
             disabled={!preview.ok || mins < MIN_SLOT_MINS}
             busy={busy}
@@ -180,12 +180,12 @@ export default function BookRest() {
         </View>
         <View style={styles.sum}>
           <AppText variant="small">Left after</AppText>
-          <AppText variant="body" color={left < 0 ? colors.grind : colors.text}>
+          <AppText variant="body" color={left < 0 ? colors.grindText : colors.text}>
             {fmtMins(left)}
           </AppText>
         </View>
         {left < 0 && preview.ok ? (
-          <AppText variant="small" color={colors.grind}>
+          <AppText variant="small" color={colors.grindText}>
             You would borrow {fmtMins(-left)} ahead. Work pays it back.
           </AppText>
         ) : null}

@@ -101,7 +101,7 @@ export default function SlotScreen() {
             ) : null}
             <Button
               title="Start now"
-              accent={colors.glow}
+             
               busy={busy}
               onPress={async () => {
                 tap();
@@ -143,7 +143,7 @@ export default function SlotScreen() {
             ) : null}
             <Button
               title={over ? 'Finish' : 'Finish early'}
-              accent={colors.glow}
+             
               busy={busy}
               onPress={() => finish(over ? slot.plannedMins : minsUsed)}
             />
@@ -167,7 +167,7 @@ export default function SlotScreen() {
         </AppText>
         {slot.state === 'active' ? (
           <>
-            <AppText variant="display" style={styles.timer} color={over ? colors.good : colors.text}>
+            <AppText variant="display" style={styles.timer} color={over ? colors.goodText : colors.text}>
               {over ? 'Time is up' : fmtTimer((plannedMs - elapsedMs) / 1000)}
             </AppText>
             <AppText variant="small">
