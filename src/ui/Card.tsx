@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     gap: space.xs,
   },
-  hero: { backgroundColor: '#d85f29', borderColor: 'transparent', overflow: 'hidden' },
+  hero: { backgroundColor: '#d12d20', borderColor: 'transparent', overflow: 'hidden' },
   heroImage: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' },
   pressed: { opacity: 0.85 },
 });

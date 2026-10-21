@@ -13,19 +13,15 @@ from PIL import Image, ImageDraw
 
 OUT = Path(__file__).resolve().parent.parent / 'assets' / 'images'
 
-# Keep in step with src/theme.ts and app.json. Every colour here was sampled from the reference pictures.
-BG = (0xe5, 0xe5, 0xe0)
-CREAM = (0xe4, 0xdf, 0xcc)
+# Keep in step with src/theme.ts and app.json. Four colours: white, orange, red (and ink, which is only used for text).
+BG = (255, 255, 255)
+WHITE = (255, 255, 255)
 ORANGE = (0xeb, 0x71, 0x2e)  # work
-AMBER = (0xf0, 0xb8, 0x46)  # rest
 RED = (0xd1, 0x2d, 0x20)
-DEEP = (0xd8, 0x5f, 0x29)  # the orange at the foot of the hero card
 
-# Two orbs on a screen-shaped canvas (fractions of its width and height). A big orange one rising off the top right, a
-# smaller amber one at the bottom left. `lit` moves the brightest point inside the orb, which is what makes it look round.
+# One orb on a screen-shaped canvas (fractions of its width and height): a big orange one rising off the top right. `lit` moves the brightest point inside the orb, which is what makes it look round.
 ORBS = [
-    dict(cx=0.88, cy=0.10, r=0.56, strength=0.62, lit=(-0.32, 0.36), color=ORANGE),
-    dict(cx=0.00, cy=0.94, r=0.42, strength=0.62, lit=(0.30, -0.32), color=AMBER),
+    dict(cx=0.88, cy=0.10, r=0.56, strength=0.5, lit=(-0.32, 0.36), color=ORANGE),
 ]
 ASPECT = 0.46  # width / height of the canvas, about a modern phone
 
@@ -80,7 +76,7 @@ def fade_png(path: Path) -> None:
 def red_to_orange(x, y):
     """Red in the top left corner running into orange, with an orange glow in the top right: the hero card and the icon."""
     t = np.clip(x * 0.3 + y * 0.7, 0, 1)[..., None]
-    rgb = np.array(RED, dtype=np.float64) * (1 - t) + np.array(DEEP, dtype=np.float64) * t
+    rgb = np.array(RED, dtype=np.float64) * (1 - t) + np.array(ORANGE, dtype=np.float64) * t
     d = np.sqrt((x - 0.98) ** 2 + (y - 0.1) ** 2) / 0.7
     glow = (np.clip(1 - d, 0, 1) ** 1.5 * 0.55)[..., None]
     return rgb * (1 - glow) + np.array(ORANGE, dtype=np.float64) * glow
@@ -137,10 +133,10 @@ if __name__ == '__main__':
     orbs_png(OUT / 'orbs.png')
     fade_png(OUT / 'fade.png')
     hero_png(OUT / 'hero.png')
-    arcs(1024, orange_sky(1024), CREAM, AMBER).convert('RGB').save(OUT / 'icon.png')
-    arcs(400, None, ORANGE, AMBER, 0.95).save(OUT / 'splash-icon.png')
-    arcs(48, orange_sky(48), CREAM, AMBER, 1.15).convert('RGB').save(OUT / 'favicon.png')
-    arcs(512, None, CREAM, AMBER, 0.62).save(OUT / 'android-icon-foreground.png')
+    arcs(1024, orange_sky(1024), WHITE, WHITE).convert('RGB').save(OUT / 'icon.png')
+    arcs(400, None, ORANGE, RED, 0.95).save(OUT / 'splash-icon.png')
+    arcs(48, orange_sky(48), WHITE, WHITE, 1.15).convert('RGB').save(OUT / 'favicon.png')
+    arcs(512, None, WHITE, WHITE, 0.62).save(OUT / 'android-icon-foreground.png')
     orange_sky(512).convert('RGBA').save(OUT / 'android-icon-background.png')
     arcs(432, None, (255, 255, 255), (255, 255, 255), 0.62).save(OUT / 'android-icon-monochrome.png')
     print('wrote', ', '.join(sorted(p.name for p in OUT.glob('*.png'))))

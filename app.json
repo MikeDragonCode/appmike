@@ -7,7 +7,7 @@
     "icon": "./assets/images/icon.png",
     "scheme": "shifttolife",
     "userInterfaceStyle": "light",
-    "backgroundColor": "#e5e5e0",
+    "backgroundColor": "#ffffff",
     "ios": {
       "supportsTablet": false,
       "infoPlist": {
@@ -34,7 +34,7 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#e5e5e0",
+          "backgroundColor": "#ffffff",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 140
         }

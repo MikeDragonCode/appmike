@@ -1,27 +1,26 @@
 import { Platform } from 'react-native';
 
-// Design tokens. Every color is taken from the reference pictures (pale grey-white, orange, red-orange, amber), plus black ink
-// and white for text. Soft orange and amber orbs float behind the screens; a deep red-orange "hero" card carries the one thing
-// that matters on each screen. Nothing else.
-// scripts/make-images.py draws the icon, the orbs, the hero gradient and the status bar fade from these colors; run it after changing them.
+// Design tokens. The whole app is four colors and nothing else: white, ink, orange and red. Everything lighter or softer is
+// one of those at a lower opacity. Orange is the accent (work, rest, buttons), red is only the deep hero card and small warnings.
+// scripts/make-images.py draws the icon, the orb, the hero gradient and the status bar fade from these colors; run it after changing them.
 export const colors = {
-  bg: '#e5e5e0', // the pale grey-white of the references
-  surface: '#f4f4f0', // cards: a lighter step of the same grey-white
-  surfaceHigh: 'rgba(235, 113, 46, 0.14)',
-  border: 'rgba(28, 20, 16, 0.14)',
-  text: '#1c1410',
-  muted: '#5f5a55',
-  grind: '#eb712e', // work: orange
-  grindText: '#b3241a', // a darker red-orange, for small text on the pale wall
-  glow: '#f0b846', // rest: sunny amber
-  good: '#f0b846',
-  goodText: '#7d5208',
-  danger: '#b3241a',
-  onAccent: '#1c1410', // text on orange and amber fills
-  heroText: '#ffffff', // text on the deep orange hero card
-  heroMuted: 'rgba(255, 255, 255, 0.92)',
+  bg: '#ffffff',
+  surface: '#ffffff', // cards: white with a thin ink line
+  surfaceHigh: 'rgba(235, 113, 46, 0.12)', // orange, faint
+  border: 'rgba(28, 20, 16, 0.12)',
+  text: '#1c1410', // ink
+  muted: 'rgba(28, 20, 16, 0.62)',
+  grind: '#eb712e', // orange
+  grindText: '#d12d20', // red, for small warnings
+  glow: '#eb712e',
+  good: '#eb712e',
+  goodText: '#1c1410',
+  danger: '#d12d20',
+  onAccent: '#1c1410', // ink on orange
+  heroText: '#ffffff', // on the red hero card
+  heroMuted: 'rgba(255, 255, 255, 0.88)',
   heroLine: 'rgba(255, 255, 255, 0.2)',
-  heroButtonText: '#b3241a',
+  heroButtonText: '#d12d20',
 } as const;
 
 export const radius = { sm: 10, md: 20, pill: 9999 } as const;

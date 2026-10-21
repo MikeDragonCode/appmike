@@ -30,20 +30,20 @@ export const RestWidget = createWidget('RestWidget', (props: WidgetSnapshot, env
 
   const status = focus ? (
     <HStack spacing={4}>
-      <Text modifiers={[font({ size: 12, weight: 'medium' }), foregroundStyle('#e4dfcc'), lineLimit(1)]}>Focus</Text>
+      <Text modifiers={[font({ size: 12, weight: 'medium' }), foregroundStyle('#ffffff'), lineLimit(1)]}>Focus</Text>
       <Text
         date={new Date(focus.startedAt)}
         dateStyle="timer"
-        modifiers={[font({ size: 12, weight: 'semibold' }), monospacedDigit(), foregroundStyle('#e4dfcc'), frame({ maxWidth: 70, alignment: 'leading' })]}
+        modifiers={[font({ size: 12, weight: 'semibold' }), monospacedDigit(), foregroundStyle('#ffffff'), frame({ maxWidth: 70, alignment: 'leading' })]}
       />
     </HStack>
   ) : next ? (
     <HStack spacing={4}>
-      <Text modifiers={[font({ size: 12 }), foregroundStyle('#e4dfcc'), lineLimit(1)]}>{next.title}</Text>
+      <Text modifiers={[font({ size: 12 }), foregroundStyle('#ffffff'), lineLimit(1)]}>{next.title}</Text>
       <Text date={new Date(next.startsAt)} dateStyle="time" modifiers={[font({ size: 12, weight: 'semibold' }), foregroundStyle('#ffffff')]} />
     </HStack>
   ) : (
-    <Text modifiers={[font({ size: 12 }), foregroundStyle('#e4dfcc'), lineLimit(1)]}>{avail >= 30 ? 'Book it so it happens' : 'Earn some with focus'}</Text>
+    <Text modifiers={[font({ size: 12 }), foregroundStyle('#ffffff'), lineLimit(1)]}>{avail >= 30 ? 'Book it so it happens' : 'Earn some with focus'}</Text>
   );
 
   return (
@@ -52,8 +52,8 @@ export const RestWidget = createWidget('RestWidget', (props: WidgetSnapshot, env
       spacing={4}
       modifiers={[padding({ all: 14 }), frame({ maxWidth: 10000, maxHeight: 10000, alignment: 'topLeading' }), containerBackground('#d12d20', 'widget'), widgetURL('shifttolife://')]}
     >
-      <Text modifiers={[font({ size: 11, weight: 'semibold' }), foregroundStyle('#e4dfcc'), textCase('uppercase')]}>Rest to book</Text>
-      <Text modifiers={[font({ size: 38, weight: 'bold', design: 'rounded' }), foregroundStyle(avail < 0 ? '#f0b846' : '#ffffff'), lineLimit(1)]}>{label}</Text>
+      <Text modifiers={[font({ size: 11, weight: 'semibold' }), foregroundStyle('#ffffff'), textCase('uppercase')]}>Rest to book</Text>
+      <Text modifiers={[font({ size: 38, weight: 'bold', design: 'rounded' }), foregroundStyle('#ffffff'), lineLimit(1)]}>{label}</Text>
       <Spacer />
       {status}
     </VStack>
@@ -75,9 +75,9 @@ export const FocusActivity = createLiveActivity('FocusActivity', (props: FocusPr
     banner: (
       <HStack spacing={12} modifiers={[padding({ all: 14 }), activityBackgroundTint('#d12d20')]}>
         <VStack alignment="leading" spacing={2}>
-          <Text modifiers={[font({ size: 13, weight: 'semibold' }), foregroundStyle('#e4dfcc'), lineLimit(1)]}>{props.name}</Text>
-          {timer(34, '#e4dfcc')}
-          <Text modifiers={[font({ size: 12 }), foregroundStyle('#e4dfcc')]}>{goal ? 'to your goal, then it counts up' : 'of focus, earning rest'}</Text>
+          <Text modifiers={[font({ size: 13, weight: 'semibold' }), foregroundStyle('#ffffff'), lineLimit(1)]}>{props.name}</Text>
+          {timer(34, '#ffffff')}
+          <Text modifiers={[font({ size: 12 }), foregroundStyle('#ffffff')]}>{goal ? 'to your goal, then it counts up' : 'of focus, earning rest'}</Text>
         </VStack>
         <Spacer />
       </HStack>
