@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { StyleSheet } from 'react-native';
 
-import { HistoryDay, activeHabits, listDays, setLogEntry } from '@/core';
+import { HistoryDay, activeHabits, bestWindow, listDays, setLogEntry } from '@/core';
 import { updateData, useStore } from '@/state/store';
 import { colors, space } from '@/theme';
 import { Card } from '@/ui/Card';
@@ -13,12 +13,15 @@ import { Screen } from '@/ui/Screen';
 import { AppText } from '@/ui/Text';
 import { TextButton } from '@/ui/TextButton';
 
+const hh = (h: number) => `${String(h).padStart(2, '0')}:00`;
+
 export default function History() {
   const { data } = useStore();
   const [adding, setAdding] = useState<string | null>(null); // date whose picker is open
   if (!data) return null;
   const days = listDays(data, 30);
   const now = new Date();
+  const window = bestWindow(data);
 
   const set = (date: string, habitId: string, value: number) =>
     updateData((d) => {
@@ -32,6 +35,17 @@ export default function History() {
       <AppText variant="small">
         Fix what you logged, or add something you forgot. Changes move your bank by the difference only.
       </AppText>
+
+      {window ? (
+        <Card>
+          <AppText variant="label">Your rhythm</AppText>
+          <AppText variant="body">
+            Your focus time gathers between {hh(window.from)} and {hh(window.to)}: {Math.round(window.share * 100)}% of the timed
+            work so far.
+          </AppText>
+          <AppText variant="small">Counted on this phone only, from the timer. Good hours to protect.</AppText>
+        </Card>
+      ) : null}
 
       {days.length === 0 ? (
         <Card>

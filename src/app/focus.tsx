@@ -45,8 +45,8 @@ export default function Focus() {
   const otherRunning = focus && !running ? data.habits.find((h) => h.id === focus.habitId) : undefined;
   const rate = habit.earnRate ?? 0;
 
-  function record(minutes: number) {
-    const earned = logWork(habit!.id, minutes);
+  function record(minutes: number, timed = false) {
+    const earned = logWork(habit!.id, minutes, timed);
     if (earned === null) return false;
     success();
     setResult({ minutes, earned });
@@ -98,7 +98,7 @@ export default function Focus() {
               accent={colors.grind}
               onPress={() => {
                 tap();
-                if (minutes >= 1 && record(minutes)) endFocus();
+                if (minutes >= 1 && record(minutes, true)) endFocus();
                 else {
                   endFocus();
                   router.back();

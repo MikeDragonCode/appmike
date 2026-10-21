@@ -71,7 +71,8 @@ export function isUserData(v: unknown): v is UserData {
     isNum(p.defaultSlotMins) &&
     isNum(p.weeklySlotGoal) &&
     (p.weekStart === undefined || (isNum(p.weekStart) && Number.isInteger(p.weekStart) && p.weekStart >= 0 && p.weekStart <= 6)) &&
-    Array.isArray(p.struggles)
+    Array.isArray(p.struggles) &&
+    (v.workByHour === undefined || (Array.isArray(v.workByHour) && v.workByHour.length === 24 && v.workByHour.every((n) => isNum(n) && n >= 0)))
   );
 }
 

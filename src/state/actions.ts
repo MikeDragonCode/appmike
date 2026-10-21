@@ -10,6 +10,8 @@ import {
   logRest,
   rescheduleSlot,
   undoLog,
+  addWorkHours,
+  removeWorkHours,
   startSlot,
   addMinutes,
 } from '@/core';
@@ -104,12 +106,17 @@ export async function endFocus(): Promise<void> {
 }
 
 // Logs work time. Returns the rest minutes earned, or null if nothing was logged.
-export function logWork(habitId: string, minutes: number): number | null {
+// A timed session also feeds the hour-by-hour rhythm; a typed-in entry does not say when it happened.
+let lastTimed: { habitId: string; minutes: number; endedAt: Date } | null = null;
+
+export function logWork(habitId: string, minutes: number, timed = false): number | null {
   const data = getState().data;
   if (!data || !(minutes > 0)) return null;
-  const r = logGrind(data, habitId, minutes, new Date());
+  const now = new Date();
+  const r = logGrind(data, habitId, minutes, now);
   if (!r) return null;
-  updateData(() => r.data);
+  updateData(() => (timed ? addWorkHours(r.data, now, minutes) : r.data));
+  lastTimed = timed ? { habitId, minutes, endedAt: now } : null;
   return r.earned;
 }
 
@@ -144,7 +151,10 @@ export function undo(kind: 'work' | 'rest', habitId: string, amount: number): bo
   if (!data) return false;
   const next = undoLog(data, kind, habitId, amount, new Date());
   if (!next) return false;
-  updateData(() => next);
+  const t = lastTimed;
+  const takeBack = kind === 'work' && t && t.habitId === habitId && t.minutes === amount;
+  updateData(() => (takeBack ? removeWorkHours(next, t.endedAt, amount) : next));
+  if (takeBack) lastTimed = null;
   return true;
 }
 

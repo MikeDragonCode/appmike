@@ -73,6 +73,7 @@ export interface UserData {
   dailyGrindHours: number; // typical grind-day length (3 light, 8 standard, 12 heavy)
   profile: Profile;
   slots: Slot[];
+  workByHour?: number[]; // minutes of timed focus by hour of day, 24 entries
   lastRecapDate?: string;
   checkinsDone?: number[]; // follow-up stages already answered or dismissed (3, 7, 14)
 }
