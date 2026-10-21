@@ -1,5 +1,5 @@
 import { StyleSheet, Text, TextProps } from 'react-native';
-import { colors } from '@/theme';
+import { colors, fonts } from '@/theme';
 
 type Variant = 'display' | 'title' | 'heading' | 'body' | 'small' | 'label';
 
@@ -14,11 +14,11 @@ export function AppText({ variant = 'body', color, center, style, ...rest }: Pro
 }
 
 const styles = StyleSheet.create({
-  display: { color: colors.text, fontSize: 48, fontWeight: '700', letterSpacing: -1 },
-  title: { color: colors.text, fontSize: 28, fontWeight: '700', letterSpacing: -0.5 },
+  display: { color: colors.text, fontFamily: fonts.display, fontSize: 52, fontWeight: '400', letterSpacing: -1.5 },
+  title: { color: colors.text, fontFamily: fonts.display, fontSize: 30, fontWeight: '400', letterSpacing: -0.6 },
   heading: { color: colors.text, fontSize: 18, fontWeight: '600' },
   body: { color: colors.text, fontSize: 16, lineHeight: 22 },
   small: { color: colors.muted, fontSize: 14, lineHeight: 20 },
-  label: { color: colors.muted, fontSize: 12, fontWeight: '600', letterSpacing: 0.8, textTransform: 'uppercase' },
+  label: { color: colors.muted, fontSize: 12, fontWeight: '600', letterSpacing: 1.4, textTransform: 'uppercase' },
   center: { textAlign: 'center' },
 });

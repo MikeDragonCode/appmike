@@ -4,7 +4,7 @@
 // runtime. Inside them only SwiftUI pieces from @expo/ui can be used, and nothing from outside the function
 // (no imports, no helpers, no theme file), so colors and small helpers are written out in place.
 import { HStack, Spacer, Text, VStack } from '@expo/ui/swift-ui';
-import { containerBackground, font, foregroundStyle, frame, lineLimit, monospacedDigit, padding, textCase, widgetURL } from '@expo/ui/swift-ui/modifiers';
+import { activityBackgroundTint, containerBackground, font, foregroundStyle, frame, lineLimit, monospacedDigit, padding, textCase, widgetURL } from '@expo/ui/swift-ui/modifiers';
 import { createLiveActivity, createWidget } from 'expo-widgets';
 import type { WidgetSnapshot } from '@/core';
 
@@ -30,30 +30,30 @@ export const RestWidget = createWidget('RestWidget', (props: WidgetSnapshot, env
 
   const status = focus ? (
     <HStack spacing={4}>
-      <Text modifiers={[font({ size: 12, weight: 'medium' }), foregroundStyle('#a85400'), lineLimit(1)]}>Focus</Text>
+      <Text modifiers={[font({ size: 12, weight: 'medium' }), foregroundStyle('#ffe2cf'), lineLimit(1)]}>Focus</Text>
       <Text
         date={new Date(focus.startedAt)}
         dateStyle="timer"
-        modifiers={[font({ size: 12, weight: 'semibold' }), monospacedDigit(), foregroundStyle('#a85400'), frame({ maxWidth: 70, alignment: 'leading' })]}
+        modifiers={[font({ size: 12, weight: 'semibold' }), monospacedDigit(), foregroundStyle('#ffe2cf'), frame({ maxWidth: 70, alignment: 'leading' })]}
       />
     </HStack>
   ) : next ? (
     <HStack spacing={4}>
-      <Text modifiers={[font({ size: 12 }), foregroundStyle('#7b6a58'), lineLimit(1)]}>{next.title}</Text>
-      <Text date={new Date(next.startsAt)} dateStyle="time" modifiers={[font({ size: 12, weight: 'semibold' }), foregroundStyle('#2c7d56')]} />
+      <Text modifiers={[font({ size: 12 }), foregroundStyle('#ffe2cf'), lineLimit(1)]}>{next.title}</Text>
+      <Text date={new Date(next.startsAt)} dateStyle="time" modifiers={[font({ size: 12, weight: 'semibold' }), foregroundStyle('#ffffff')]} />
     </HStack>
   ) : (
-    <Text modifiers={[font({ size: 12 }), foregroundStyle('#7b6a58'), lineLimit(1)]}>{avail >= 30 ? 'Book it so it happens' : 'Earn some with focus'}</Text>
+    <Text modifiers={[font({ size: 12 }), foregroundStyle('#ffe2cf'), lineLimit(1)]}>{avail >= 30 ? 'Book it so it happens' : 'Earn some with focus'}</Text>
   );
 
   return (
     <VStack
       alignment="leading"
       spacing={4}
-      modifiers={[padding({ all: 14 }), frame({ maxWidth: 10000, maxHeight: 10000, alignment: 'topLeading' }), containerBackground('#fff8ef', 'widget'), widgetURL('shifttolife://')]}
+      modifiers={[padding({ all: 14 }), frame({ maxWidth: 10000, maxHeight: 10000, alignment: 'topLeading' }), containerBackground('#b93f17', 'widget'), widgetURL('shifttolife://')]}
     >
-      <Text modifiers={[font({ size: 11, weight: 'semibold' }), foregroundStyle('#7b6a58'), textCase('uppercase')]}>Rest to book</Text>
-      <Text modifiers={[font({ size: 38, weight: 'bold', design: 'rounded' }), foregroundStyle(avail < 0 ? '#c7442e' : '#2d2118'), lineLimit(1)]}>{label}</Text>
+      <Text modifiers={[font({ size: 11, weight: 'semibold' }), foregroundStyle('#ffe2cf'), textCase('uppercase')]}>Rest to book</Text>
+      <Text modifiers={[font({ size: 38, weight: 'bold', design: 'rounded' }), foregroundStyle(avail < 0 ? '#ffd0b8' : '#ffffff'), lineLimit(1)]}>{label}</Text>
       <Spacer />
       {status}
     </VStack>
@@ -73,19 +73,19 @@ export const FocusActivity = createLiveActivity('FocusActivity', (props: FocusPr
   );
   return {
     banner: (
-      <HStack spacing={12} modifiers={[padding({ all: 14 })]}>
+      <HStack spacing={12} modifiers={[padding({ all: 14 }), activityBackgroundTint('#b93f17')]}>
         <VStack alignment="leading" spacing={2}>
-          <Text modifiers={[font({ size: 13, weight: 'semibold' }), foregroundStyle('#7b6a58'), lineLimit(1)]}>{props.name}</Text>
-          {timer(34, '#a85400')}
-          <Text modifiers={[font({ size: 12 }), foregroundStyle('#7b6a58')]}>{goal ? 'to your goal, then it counts up' : 'of focus, earning rest'}</Text>
+          <Text modifiers={[font({ size: 13, weight: 'semibold' }), foregroundStyle('#ffe2cf'), lineLimit(1)]}>{props.name}</Text>
+          {timer(34, '#ffe2cf')}
+          <Text modifiers={[font({ size: 12 }), foregroundStyle('#ffe2cf')]}>{goal ? 'to your goal, then it counts up' : 'of focus, earning rest'}</Text>
         </VStack>
         <Spacer />
       </HStack>
     ),
     compactLeading: <Text modifiers={[font({ size: 14 })]}>⏱</Text>,
-    compactTrailing: timer(14, '#f08a24'),
+    compactTrailing: timer(14, '#ffb98a'),
     minimal: <Text modifiers={[font({ size: 14 })]}>⏱</Text>,
     expandedCenter: <Text modifiers={[font({ size: 15, weight: 'semibold' }), lineLimit(1)]}>{props.name}</Text>,
-    expandedBottom: timer(26, '#f08a24'),
+    expandedBottom: timer(26, '#ffb98a'),
   };
 });

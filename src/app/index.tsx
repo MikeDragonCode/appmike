@@ -101,38 +101,39 @@ export default function Today() {
         </Card>
       ) : null}
 
-      <Card style={styles.bank}>
-        <AppText variant="label">Rest you can book</AppText>
-        <AppText variant="display" color={avail < 0 ? colors.danger : colors.text}>
+      <Card hero style={styles.bank}>
+        <AppText variant="label" color={colors.heroMuted}>Rest you can book</AppText>
+        <AppText variant="display" color={avail < 0 ? '#ffe2cf' : colors.heroText} style={styles.bankNumber}>
           {fmtMins(avail)}
         </AppText>
-        <AppText variant="small">
+        <AppText variant="small" color={colors.heroMuted}>
           {reserved > 0 ? `${fmtMins(reserved)} is held for booked rest. ` : ''}
           {isRestDay(data, now) ? 'Rest day: rest costs half.' : `Today earned ${fmtMins(day.earned)}, spent ${fmtMins(day.spent)}.`}
         </AppText>
-        <AppText variant="body" style={styles.hint}>
+        <AppText variant="body" color={colors.heroText} style={styles.hint}>
           {hint.text}
         </AppText>
         {hint.kind === 'close' ? (
           <>
-            <Button title="Close the day" onPress={() => router.push('/close-day')} />
+            <Button onHero title="Close the day" onPress={() => router.push('/close-day')} />
             {avail >= MIN_SLOT_MINS ? (
-              <Button kind="secondary" title="Book rest" onPress={() => router.push('/book')} />
+              <Button onHero kind="secondary" title="Book rest" onPress={() => router.push('/book')} />
             ) : null}
           </>
         ) : avail < data.profile.defaultSlotMins && firstFocus ? (
           <Button
+            onHero
             title={`Start ${firstFocus.name}`}
             kind={mainKind}
             accent={colors.grind}
             onPress={() => router.push({ pathname: '/focus', params: { habitId: firstFocus.id } })}
           />
         ) : (
-          <Button title="Book rest" kind={mainKind} onPress={() => router.push('/book')} />
+          <Button onHero title="Book rest" kind={mainKind} onPress={() => router.push('/book')} />
         )}
-        <Button small kind="ghost" title="Log rest I already took" onPress={() => router.push('/log-rest')} />
+        <Button onHero small kind="ghost" title="Log rest I already took" onPress={() => router.push('/log-rest')} />
         {hint.kind !== 'close' && !day.closed ? (
-          <Button small kind="ghost" title="Close the day" onPress={() => router.push('/close-day')} />
+          <Button onHero small kind="ghost" title="Close the day" onPress={() => router.push('/close-day')} />
         ) : null}
       </Card>
 
@@ -205,7 +206,8 @@ export default function Today() {
 const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'flex-start', gap: space.md },
   flex: { flex: 1 },
-  bank: { gap: space.sm, padding: space.xl },
+  bank: { gap: space.sm, padding: space.xl, paddingVertical: space.xxl },
+  bankNumber: { lineHeight: 60 },
   hint: { marginTop: space.xs, marginBottom: space.sm },
   section: { gap: space.sm },
 });

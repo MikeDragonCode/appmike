@@ -10,13 +10,16 @@ interface Props {
   disabled?: boolean;
   busy?: boolean;
   small?: boolean;
+  onHero?: boolean; // sitting on the deep orange hero card
   style?: ViewStyle;
 }
 
-export function Button({ title, onPress, kind = 'primary', accent, disabled, busy, small, style }: Props) {
+export function Button({ title, onPress, kind = 'primary', accent, disabled, busy, small, onHero, style }: Props) {
   const off = disabled || busy;
-  const fill = kind === 'primary' ? (accent ?? colors.grind) : kind === 'secondary' ? colors.surfaceHigh : 'transparent';
-  const textColor = kind === 'primary' ? colors.onAccent : kind === 'danger' ? colors.danger : colors.text;
+  const fill =
+    kind === 'primary' ? (onHero ? '#ffffff' : (accent ?? colors.grind)) : kind === 'secondary' ? (onHero ? colors.heroLine : colors.surfaceHigh) : 'transparent';
+  const textColor =
+    kind === 'primary' ? (onHero ? colors.heroButtonText : colors.onAccent) : kind === 'danger' ? colors.danger : onHero ? colors.heroText : colors.text;
   return (
     <Pressable
       accessibilityRole="button"
