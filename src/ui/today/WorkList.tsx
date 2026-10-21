@@ -16,13 +16,20 @@ interface Props {
   onStart: (h: HabitItem) => void;
   onAdd: (h: HabitItem) => void;
   onUndo: () => void;
+  onManage: () => void; // opens the activities screen
 }
 
-export function WorkList({ habits, loggedToday, runningHabitId, toast, onStart, onAdd, onUndo }: Props) {
+export function WorkList({ habits, loggedToday, runningHabitId, toast, onStart, onAdd, onUndo, onManage }: Props) {
   return (
     <View style={styles.section}>
       <AppText variant="label">Work</AppText>
       <Card>
+        {habits.length === 0 ? (
+          <View style={styles.empty}>
+            <AppText variant="small">No work activities yet. Add one and its time starts earning rest.</AppText>
+            <TextButton title="Add an activity" onPress={onManage} />
+          </View>
+        ) : null}
         {habits.map((h, i) => {
           const logged = loggedToday(h.id);
           return (
@@ -64,6 +71,7 @@ export function WorkList({ habits, loggedToday, runningHabitId, toast, onStart, 
 const styles = StyleSheet.create({
   section: { gap: space.sm },
   flex: { flex: 1 },
+  empty: { gap: space.sm, paddingVertical: space.sm, alignItems: 'flex-start' },
   item: { flexDirection: 'row', alignItems: 'center', gap: space.md, paddingVertical: space.sm },
   toast: { flexDirection: 'row', alignItems: 'center', gap: space.lg },
 });

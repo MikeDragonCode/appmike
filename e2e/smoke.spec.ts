@@ -419,3 +419,18 @@ test('Settings can change the week start, and Today follows', async ({ page }) =
   await tap(page, 'Done');
   await expect(page.getByText(WEEKDAYS)).toHaveText(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']);
 });
+
+test('Book rest shows which "When" choice is picked, and drops it after a hand-made time', async ({ page }) => {
+  await open(page);
+  await onboard(page);
+  await logDeepWork(page, 120);
+  await tap(page, 'Book rest');
+  const chip = (name: string) => page.getByRole('button', { name, exact: true });
+  await expect(chip('Now')).toHaveAttribute('aria-selected', 'true');
+  await tap(page, 'In 1 hour');
+  await expect(chip('In 1 hour')).toHaveAttribute('aria-selected', 'true');
+  await expect(chip('Now')).toHaveAttribute('aria-selected', 'false');
+  await page.getByLabel('Increase Today').click();
+  await expect(chip('In 1 hour')).toHaveAttribute('aria-selected', 'false');
+  await expect(chip('Now')).toHaveAttribute('aria-selected', 'false');
+});

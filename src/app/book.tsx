@@ -33,7 +33,13 @@ export default function BookRest() {
   const rest = data ? activeHabits(data, 'glow').filter((h) => h.valueType === 'duration') : [];
   const [habitId, setHabitId] = useState(rest[0]?.id ?? '');
   const [mins, setMins] = useState(data?.profile.defaultSlotMins ?? 60);
-  const [startsAt, setStartsAt] = useState<Date | null>(null); // null = now
+  const [startsAt, setStartsAtRaw] = useState<Date | null>(null); // null = now
+  const [preset, setPreset] = useState<string | null>('now'); // which "When" chip made this time, if any
+  // Any hand-made time (stepper, bedtime fixes) clears the highlighted chip.
+  const setStartsAt = (d: Date | null) => {
+    setStartsAtRaw(d);
+    setPreset(d === null ? 'now' : null);
+  };
   const [busy, setBusy] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
 
@@ -64,9 +70,10 @@ export default function BookRest() {
     else router.back();
   }
 
-  const setOffset = (m: number) => {
+  const pick = (key: string, d: Date | null) => {
     tap();
-    setStartsAt(m === 0 ? null : nextQuarter(addMinutes(now, m - 1)));
+    setStartsAtRaw(d);
+    setPreset(key);
   };
   const evening = new Date(now);
   evening.setHours(20, 0, 0, 0);
@@ -130,13 +137,13 @@ export default function BookRest() {
 
       <AppText variant="label">When</AppText>
       <Row>
-        <Chip label="Now" tint={colors.glow} selected={startsAt === null} onPress={() => setOffset(0)} />
-        <Chip label="In 30 min" tint={colors.glow} selected={false} onPress={() => setOffset(30)} />
-        <Chip label="In 1 hour" tint={colors.glow} selected={false} onPress={() => setOffset(60)} />
+        <Chip label="Now" tint={colors.glow} selected={preset === 'now'} onPress={() => pick('now', null)} />
+        <Chip label="In 30 min" tint={colors.glow} selected={preset === '30'} onPress={() => pick('30', nextQuarter(addMinutes(now, 29)))} />
+        <Chip label="In 1 hour" tint={colors.glow} selected={preset === '60'} onPress={() => pick('60', nextQuarter(addMinutes(now, 59)))} />
         {evening.getTime() > now.getTime() ? (
-          <Chip label="Tonight 20:00" tint={colors.glow} selected={false} onPress={() => { tap(); setStartsAt(evening); }} />
+          <Chip label="Tonight 20:00" tint={colors.glow} selected={preset === 'eve'} onPress={() => pick('eve', evening)} />
         ) : null}
-        <Chip label="Tomorrow 09:00" tint={colors.glow} selected={false} onPress={() => { tap(); setStartsAt(tomorrow); }} />
+        <Chip label="Tomorrow 09:00" tint={colors.glow} selected={preset === 'tom'} onPress={() => pick('tom', tomorrow)} />
       </Row>
       <Stepper
         label={startsAt === null ? 'Starts now' : dayWord(start, now)}

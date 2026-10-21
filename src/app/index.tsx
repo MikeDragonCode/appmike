@@ -176,6 +176,7 @@ export default function Today() {
         toast={toast}
         onStart={(h) => router.push({ pathname: '/focus', params: { habitId: h.id } })}
         onAdd={addCount}
+        onManage={() => router.push('/activities')}
         onUndo={() => {
           if (!toast) return;
           undo('work', toast.habitId, 1);
