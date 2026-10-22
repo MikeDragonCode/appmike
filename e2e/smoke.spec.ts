@@ -146,7 +146,7 @@ test('a counter tap can be undone right away', async ({ page }) => {
   await tap(page, 'Continue');
   await tap(page, 'Cook / Chores');
   for (let i = 0; i < 3; i++) await tap(page, 'Continue');
-  await tap(page, 'Start');
+  await tap(page, 'I am in');
   await tap(page, '+1');
   await expect(page.getByText('+15 min of rest')).toBeVisible();
   await expect(page.getByText('You have 15 min of rest saved.')).toBeHidden();
@@ -408,7 +408,7 @@ test('the week start can be chosen while setting up, and rest days are listed in
   await expect(days).toHaveText(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']);
   await expect(page.getByRole('button', { name: 'Sat' })).toHaveAttribute('aria-selected', 'true'); // rest days kept
   for (let i = 0; i < 4; i++) await tap(page, 'Continue');
-  await tap(page, 'Start');
+  await tap(page, 'I am in');
   await expect(page.getByText(WEEKDAYS)).toHaveText(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']);
 });
 
@@ -486,4 +486,28 @@ test('after a rest, one tap says whether it recharged you, and it is asked only 
   await tap(page, 'A bit');
   await expect(page.getByText('Noted: a bit. Only you see this.')).toBeVisible();
   await expect(page.getByText('Not really', { exact: true })).toHaveCount(0);
+});
+
+test('a timed focus block gets one breath before the reward, and it can be skipped', async ({ page }) => {
+  await open(page);
+  await onboard(page);
+  await tap(page, 'Start Deep Work');
+  await tap(page, 'Start timer');
+  await page.clock.fastForward(31 * 60_000);
+  await tap(page, 'Finish and log');
+  await expect(page.getByText('Breathe in', { exact: true })).toBeVisible();
+  await expect(page.getByText('Rest earned')).toHaveCount(0);
+  await tap(page, 'Skip');
+  await expect(page.getByText('Rest earned')).toBeVisible();
+});
+
+test('onboarding ends with a small deal, and a manual log skips the breath', async ({ page }) => {
+  await open(page);
+  await tap(page, 'Begin');
+  await tap(page, 'Rest turns into scrolling');
+  for (let i = 0; i < 5; i++) await tap(page, 'Continue');
+  await expect(page.getByText('I do the work. I take the rest. Both count.')).toBeVisible();
+  await tap(page, 'I am in');
+  await expect(page.getByText('Rest you can book')).toBeVisible();
+  await logDeepWork(page, 30); // logged by hand: straight to the reward, no breath
 });

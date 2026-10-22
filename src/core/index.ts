@@ -21,3 +21,4 @@ export * from './moments';
 export * from './widget';
 export * from './pick';
 export * from './insights';
+export * from './month';

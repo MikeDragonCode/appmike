@@ -134,6 +134,10 @@ export function PlanStep({ lines }: { lines: string[] }) {
           <AppText variant="body">{line}</AppText>
         </Card>
       ))}
+      <Card selected>
+        <AppText variant="label">The deal</AppText>
+        <AppText variant="heading">I do the work. I take the rest. Both count.</AppText>
+      </Card>
       <AppText variant="small">
         We may ask to send reminders. They are local to your phone and optional. You can adjust the plan any time in Settings.
       </AppText>

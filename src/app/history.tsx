@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { HistoryDay, activeHabits, allMoments, bestWindow, listDays, restInsight, setLogEntry } from '@/core';
+import { HistoryDay, activeHabits, allMoments, bestWindow, listDays, monthSummary, restInsight, setLogEntry } from '@/core';
 import { updateData, useStore } from '@/state/store';
 import { colors, radius, space } from '@/theme';
 import { Card } from '@/ui/Card';
@@ -23,6 +23,7 @@ export default function History() {
   const now = new Date();
   const window = bestWindow(data);
   const insight = restInsight(data, new Date());
+  const month = monthSummary(data, new Date());
   const moments = allMoments(data);
   const got = moments.filter((m) => m.earned).length;
 
@@ -62,6 +63,17 @@ export default function History() {
         </View>
         <AppText variant="small">They only ever get added. Nothing here resets.</AppText>
       </Card>
+
+      {month ? (
+        <Card>
+          <AppText variant="label">Your month</AppText>
+          <AppText variant="body">
+            {fmtMins(month.workMins)} of work, and {fmtMins(month.restMins)} of rest you gave yourself
+            {month.restsTaken > 0 ? `, ${month.restsTaken} of them booked ahead` : ''}.
+          </AppText>
+          <AppText variant="small">Earned fair and square. Only on this phone.</AppText>
+        </Card>
+      ) : null}
 
       {insight ? (
         <Card>

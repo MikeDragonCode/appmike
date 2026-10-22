@@ -17,7 +17,7 @@ export async function onboard(page: Page, struggles: string[] = []) {
   // At least one is required; the one that changes no settings is the quiet default.
   for (const s of struggles.length ? struggles : ['Rest turns into scrolling']) await tap(page, s);
   for (let i = 0; i < 5; i++) await tap(page, 'Continue');
-  await tap(page, 'Start');
+  await tap(page, 'I am in');
   await expect(page.getByText('Rest you can book')).toBeVisible();
 }
 

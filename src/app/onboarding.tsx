@@ -84,7 +84,7 @@ export default function Onboarding() {
     <Button kind="ghost" title="Back" onPress={() => setRestoring(false)} />
   ) : (
     <>
-      <Button title={step === 0 ? 'Begin' : step === STEPS - 1 ? 'Start' : 'Continue'} onPress={next} disabled={!canContinue} busy={busy} />
+      <Button title={step === 0 ? 'Begin' : step === STEPS - 1 ? 'I am in' : 'Continue'} onPress={next} disabled={!canContinue} busy={busy} />
       {step > 0 ? <Button title="Back" kind="ghost" onPress={() => setStep(step - 1)} /> : null}
     </>
   );

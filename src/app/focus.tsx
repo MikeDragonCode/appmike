@@ -1,6 +1,6 @@
 import { useKeepAwake } from 'expo-keep-awake';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { endFocus, logWork, startFocus, undo } from '@/state/actions';
@@ -9,6 +9,7 @@ import { useNow } from '@/hooks/useNow';
 import { colors, space } from '@/theme';
 import { Button } from '@/ui/Button';
 import { Card } from '@/ui/Card';
+import { Breath } from '@/ui/Breath';
 import { Chip, Row, Stepper } from '@/ui/controls';
 import { fmtMins, fmtTimer } from '@/ui/format';
 import { success, tap } from '@/ui/haptics';
@@ -29,7 +30,9 @@ export default function Focus() {
   const now = useNow(1000);
   const [manual, setManual] = useState(30);
   const [goal, setGoal] = useState(0); // minutes, 0 = no goal
-  const [result, setResult] = useState<{ minutes: number; earned: number } | null>(null);
+  const [result, setResult] = useState<{ minutes: number; earned: number; timed: boolean } | null>(null);
+  const [breathed, setBreathed] = useState(false); // a timed block gets one slow breath before the reward
+  const doneBreathing = useCallback(() => setBreathed(true), []);
   const [confirmDiscard, setConfirmDiscard] = useState(false);
 
   const habit = data?.habits.find((h) => h.id === habitId && h.type === 'grind' && h.valueType === 'duration');
@@ -50,8 +53,17 @@ export default function Focus() {
     const earned = logWork(habit!.id, minutes, timed);
     if (earned === null) return false;
     success();
-    setResult({ minutes, earned });
+    setResult({ minutes, earned, timed });
     return true;
+  }
+
+  if (result && result.timed && !breathed) {
+    return (
+      <Screen padTop={false} footer={<Button kind="ghost" title="Skip" onPress={doneBreathing} />}>
+        <ModalHeader title="Nice work" onClose={() => router.back()} />
+        <Breath onDone={doneBreathing} />
+      </Screen>
+    );
   }
 
   if (result) {
