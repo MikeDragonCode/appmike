@@ -2,7 +2,7 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
 
-import { MAX_STRUGGLES, STRUGGLES, Struggle, applyStruggles, completeCheckin, describePlan, dueCheckin } from '@/core';
+import { STRUGGLES, Struggle, applyStruggles, completeCheckin, describePlan, dueCheckin } from '@/core';
 import { ensurePermission } from '@/services/notifications';
 import { updateData, useStore } from '@/state/store';
 import { space } from '@/theme';
@@ -53,7 +53,7 @@ export default function Checkin() {
     >
       <ModalHeader title={`Day ${stage} check-in`} />
       <AppText variant="small">
-        Things change. Pick what is hardest right now (up to {MAX_STRUGGLES}) and the rules will follow. Your own settings
+        Things change. Pick what is hardest right now and the rules will follow. Your own settings
         stay as they are.
       </AppText>
       {STRUGGLES.map((s) => {
@@ -64,7 +64,7 @@ export default function Checkin() {
             selected={on}
             onPress={() => {
               tap();
-              setPicked(on ? picked.filter((x) => x !== s.id) : [...picked, s.id].slice(-MAX_STRUGGLES));
+              setPicked(on ? picked.filter((x) => x !== s.id) : [...picked, s.id]);
             }}
           >
             <AppText variant="heading">{s.title}</AppText>

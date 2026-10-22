@@ -11,6 +11,7 @@ test('onboarding lands on an empty Today', async ({ page }) => {
 test('onboarding needs at least two activities of each kind', async ({ page }) => {
   await open(page);
   await tap(page, 'Begin');
+  await tap(page, 'Rest turns into scrolling');
   await tap(page, 'Continue');
   await tap(page, 'Continue'); // now on the work step with three picked
   await tap(page, 'Deep Work');
@@ -140,6 +141,7 @@ test('rest taken without booking can be logged, and undone', async ({ page }) =>
 test('a counter tap can be undone right away', async ({ page }) => {
   await open(page);
   await tap(page, 'Begin');
+  await tap(page, 'Rest turns into scrolling');
   await tap(page, 'Continue');
   await tap(page, 'Continue');
   await tap(page, 'Cook / Chores');
@@ -316,6 +318,7 @@ test('a focus goal shows what is left and says so once it is reached', async ({ 
 test('onboarding lets you add your own activity and remove it again', async ({ page }) => {
   await open(page);
   await tap(page, 'Begin');
+  await tap(page, 'Rest turns into scrolling');
   await tap(page, 'Continue');
   await tap(page, 'Continue'); // work step
   await page.getByLabel('Your own work activity').fill('Writing');
@@ -397,6 +400,7 @@ test.describe('the week starts where the phone region says it does', () => {
 test('the week start can be chosen while setting up, and rest days are listed in that order', async ({ page }) => {
   await open(page); // en-US: Sunday first by default
   await tap(page, 'Begin');
+  await tap(page, 'Rest turns into scrolling');
   await tap(page, 'Continue'); // Your rhythm
   const days = page.getByRole('button', { name: WEEKDAYS });
   await expect(days).toHaveText(['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']);
@@ -448,4 +452,14 @@ test('a first focus block earns a moment that shows once and stays in the collec
   await tap(page, 'History');
   await expect(page.getByText('Moments, 1 of 10')).toBeVisible();
   await expect(page.getByText('First spark')).toBeVisible();
+});
+
+test('onboarding needs one struggle and allows as many as you like', async ({ page }) => {
+  await open(page);
+  await tap(page, 'Begin');
+  await tap(page, 'Continue'); // nothing picked yet: must not advance
+  await expect(page.getByText('What is hardest right now?')).toBeVisible();
+  for (const s of ['Not enough sleep', 'I work too late', 'No energy after work']) await tap(page, s);
+  await tap(page, 'Continue');
+  await expect(page.getByText('Your rhythm')).toBeVisible();
 });

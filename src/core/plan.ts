@@ -11,8 +11,6 @@ export const STRUGGLES: { id: Struggle; title: string; hint: string }[] = [
   { id: 'no_time_hobbies', title: 'No time for hobbies or sport', hint: 'The things I like keep getting skipped' },
 ];
 
-export const MAX_STRUGGLES = 2;
-
 export const PACE_OPTIONS = [
   { hours: 3, title: 'Light', hint: 'A few focused hours and you are done' },
   { hours: 8, title: 'Standard', hint: 'A classic full-time rhythm' },

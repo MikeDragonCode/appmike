@@ -29,7 +29,7 @@ export interface DayLog {
   tomorrowFirst?: string; // "first task for tomorrow" written during the ritual
 }
 
-// What the user says is hardest right now (onboarding question, up to two).
+// What the user says is hardest right now (onboarding question, at least one).
 export type Struggle = 'sleep' | 'overwork' | 'no_energy' | 'scrolling' | 'no_time_hobbies';
 
 export interface Profile {

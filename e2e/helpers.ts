@@ -14,7 +14,8 @@ export const tap = (page: Page, text: string) => page.getByText(text, { exact: t
 // Walks the questionnaire. Pass struggle titles to pick; everything else stays default.
 export async function onboard(page: Page, struggles: string[] = []) {
   await tap(page, 'Begin');
-  for (const s of struggles) await tap(page, s);
+  // At least one is required; the one that changes no settings is the quiet default.
+  for (const s of struggles.length ? struggles : ['Rest turns into scrolling']) await tap(page, s);
   for (let i = 0; i < 5; i++) await tap(page, 'Continue');
   await tap(page, 'Start');
   await expect(page.getByText('Rest you can book')).toBeVisible();

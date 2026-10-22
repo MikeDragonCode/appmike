@@ -30,6 +30,7 @@ import { AppText } from '@/ui/Text';
 
 // Welcome, hardest thing, rhythm, work, rest, the trade, the plan.
 const STEPS = 7;
+const STRUGGLES_STEP = 1;
 const WORK_STEP = 3;
 const REST_STEP = 4;
 
@@ -54,7 +55,9 @@ export default function Onboarding() {
   const plan = describePlan(buildProfile(answers));
 
   const canContinue =
-    step === WORK_STEP
+    step === STRUGGLES_STEP
+      ? struggles.length >= 1
+      : step === WORK_STEP
       ? grindIds.length + customGrind.length >= MIN_ACTIVITIES
       : step === REST_STEP
         ? glowIds.length + customGlow.length >= MIN_ACTIVITIES

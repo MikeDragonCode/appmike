@@ -1,6 +1,5 @@
 import { StyleSheet, View } from 'react-native';
 import {
-  MAX_STRUGGLES,
   PACE_OPTIONS,
   REST_PER_HOUR_MAX,
   REST_PER_HOUR_MIN,
@@ -41,7 +40,7 @@ export function StrugglesStep({ value, onChange }: { value: Struggle[]; onChange
   return (
     <View style={styles.block}>
       <AppText variant="title">What is hardest right now?</AppText>
-      <AppText variant="small">Pick up to {MAX_STRUGGLES}. This sets your starting rules. You can change anything later.</AppText>
+      <AppText variant="small">Pick at least one, as many as fit. This sets your starting rules. You can change anything later.</AppText>
       {STRUGGLES.map((s) => {
         const on = value.includes(s.id);
         return (
@@ -50,7 +49,7 @@ export function StrugglesStep({ value, onChange }: { value: Struggle[]; onChange
             selected={on}
             onPress={() => {
               tap();
-              onChange(on ? value.filter((x) => x !== s.id) : [...value, s.id].slice(-MAX_STRUGGLES));
+              onChange(on ? value.filter((x) => x !== s.id) : [...value, s.id]);
             }}
           >
             <AppText variant="heading">{s.title}</AppText>
