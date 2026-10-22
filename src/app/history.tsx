@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { HistoryDay, activeHabits, allMoments, bestWindow, listDays, setLogEntry } from '@/core';
+import { HistoryDay, activeHabits, allMoments, bestWindow, listDays, restInsight, setLogEntry } from '@/core';
 import { updateData, useStore } from '@/state/store';
 import { colors, radius, space } from '@/theme';
 import { Card } from '@/ui/Card';
@@ -22,6 +22,7 @@ export default function History() {
   const days = listDays(data, 30);
   const now = new Date();
   const window = bestWindow(data);
+  const insight = restInsight(data, new Date());
   const moments = allMoments(data);
   const got = moments.filter((m) => m.earned).length;
 
@@ -61,6 +62,17 @@ export default function History() {
         </View>
         <AppText variant="small">They only ever get added. Nothing here resets.</AppText>
       </Card>
+
+      {insight ? (
+        <Card>
+          <AppText variant="label">Your rest, lately</AppText>
+          <AppText variant="body">
+            {insight.recharged} of your last {insight.rated} rests left you recharged.
+            {insight.best ? ` ${insight.best.name} does it most often.` : ''}
+          </AppText>
+          <AppText variant="small">From your own notes after each rest. Only on this phone.</AppText>
+        </Card>
+      ) : null}
 
       {window ? (
         <Card>

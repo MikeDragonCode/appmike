@@ -47,6 +47,9 @@ export interface Profile {
   remindBank: boolean; // nudge when earned rest piles up unbooked
 }
 
+// How a finished rest felt: 0 not really, 1 a bit, 2 yes.
+export type Recharge = 0 | 1 | 2;
+
 export type SlotState = 'planned' | 'active' | 'done' | 'partial' | 'skipped';
 
 // A booked piece of rest. While planned/active it reserves bank minutes.
@@ -60,6 +63,7 @@ export interface Slot {
   startedAt?: string;
   finishedAt?: string;
   actualMins?: number;
+  recharge?: Recharge; // the person's own note after the rest
   notificationId?: string;
 }
 

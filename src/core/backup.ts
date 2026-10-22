@@ -29,7 +29,8 @@ function validSlot(s: unknown): s is Slot {
     isStr(s.startsAt) &&
     !Number.isNaN(Date.parse(s.startsAt)) &&
     ['planned', 'active', 'done', 'partial', 'skipped'].includes(s.state as string) &&
-    isNum(s.reservedCost)
+    isNum(s.reservedCost) &&
+    (s.recharge === undefined || s.recharge === 0 || s.recharge === 1 || s.recharge === 2)
   );
 }
 

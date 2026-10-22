@@ -2,13 +2,13 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { COMPLETE_THRESHOLD, FinishOutcome, addMinutes } from '@/core';
-import { BOOK_ERRORS, beginSlot, endSlot, extendRunningSlot, moveSlot } from '@/state/actions';
+import { COMPLETE_THRESHOLD, FinishOutcome, Recharge, addMinutes } from '@/core';
+import { BOOK_ERRORS, beginSlot, endSlot, extendRunningSlot, moveSlot, rateRest } from '@/state/actions';
 import { useStore } from '@/state/store';
 import { useNow } from '@/hooks/useNow';
 import { colors, space } from '@/theme';
 import { Button } from '@/ui/Button';
-import { Stepper } from '@/ui/controls';
+import { Chip, Row, Stepper } from '@/ui/controls';
 import { Card } from '@/ui/Card';
 import { dayWord, fmtClock, fmtMins, fmtTimer } from '@/ui/format';
 import { success, tap } from '@/ui/haptics';
@@ -77,6 +77,28 @@ export default function SlotScreen() {
             {msg}
           </AppText>
         </Card>
+        {slot.state === 'done' || slot.state === 'partial' ? (
+          <Card>
+            <AppText variant="label">Did that recharge you?</AppText>
+            {slot.recharge === undefined ? (
+              <Row>
+                {RECHARGE.map((r) => (
+                  <Chip
+                    key={r.value}
+                    label={r.label}
+                    selected={false}
+                    onPress={() => {
+                      tap();
+                      rateRest(slot.id, r.value);
+                    }}
+                  />
+                ))}
+              </Row>
+            ) : (
+              <AppText variant="small">Noted: {RECHARGE.find((r) => r.value === slot.recharge)?.label.toLowerCase()}. Only you see this.</AppText>
+            )}
+          </Card>
+        ) : null}
       </Screen>
     );
   }
@@ -203,6 +225,12 @@ export default function SlotScreen() {
     </Screen>
   );
 }
+
+const RECHARGE: { value: Recharge; label: string }[] = [
+  { value: 0, label: 'Not really' },
+  { value: 1, label: 'A bit' },
+  { value: 2, label: 'Yes' },
+];
 
 function closedMessage(state: string, actual: number, planned: number): string {
   if (state === 'done') return `Rest taken: ${actual} min. Well spent.`;

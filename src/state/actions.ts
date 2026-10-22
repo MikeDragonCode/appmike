@@ -14,6 +14,8 @@ import {
   removeWorkHours,
   startSlot,
   addMinutes,
+  rateSlot,
+  Recharge,
 } from '@/core';
 import {
   cancelFocusEnd,
@@ -27,6 +29,11 @@ import { Focus, getState, setFocus, updateData } from './store';
 
 // Everything that changes data AND has side effects (reminders, timers)
 // lives here, so screens stay thin and core stays pure.
+
+// The person's own note on how a finished rest felt. Never touches the bank.
+export function rateRest(slotId: string, recharge: Recharge): void {
+  updateData((d) => rateSlot(d, slotId, recharge) ?? d);
+}
 
 export function newId(prefix: string): string {
   return `${prefix}_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;

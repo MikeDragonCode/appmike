@@ -473,3 +473,17 @@ test('"Your usual" books tonight\'s rest with one tap', async ({ page }) => {
   await expect(page.getByText('Next rest')).toBeVisible();
   await expect(page.getByText('Your usual')).toHaveCount(0); // booked: the offer goes away
 });
+
+test('after a rest, one tap says whether it recharged you, and it is asked only once', async ({ page }) => {
+  await open(page);
+  await onboard(page);
+  await logDeepWork(page, 120);
+  await tap(page, 'Book rest');
+  await tap(page, 'Start now');
+  await page.clock.fastForward('01:01:00');
+  await tap(page, 'Finish');
+  await expect(page.getByText('Did that recharge you?')).toBeVisible();
+  await tap(page, 'A bit');
+  await expect(page.getByText('Noted: a bit. Only you see this.')).toBeVisible();
+  await expect(page.getByText('Not really', { exact: true })).toHaveCount(0);
+});
