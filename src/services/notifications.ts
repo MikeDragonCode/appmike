@@ -1,6 +1,6 @@
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
-import { WIND_DOWN_BEFORE_BED_MINS, Profile, Slot, UserData, availableMins, formatHM, parseHM } from '@/core';
+import { WIND_DOWN_BEFORE_BED_MINS, Profile, Slot, UserData, availableMins, formatHM, parseHM, restNudge, tonightsPick } from '@/core';
 
 // Local notifications only: nothing leaves the device. On web everything here
 // is a safe no-op.
@@ -12,6 +12,9 @@ const ID_WIND_DOWN = 'wind-down';
 const ID_BANK = 'bank-nudge';
 const slotStartId = (slotId: string) => `slot-start-${slotId}`;
 const slotEndId = (slotId: string) => `slot-end-${slotId}`;
+const slotSoonId = (slotId: string) => `slot-soon-${slotId}`;
+
+const SOON_MINS = 15; // a little anticipation before the rest starts
 
 export function setupNotifications(): void {
   if (!supported) return;
@@ -87,6 +90,10 @@ export async function scheduleSlotStart(slot: Slot, habitName: string): Promise<
       new Date(slot.startsAt),
       { slotId: slot.id },
     );
+    const soon = new Date(new Date(slot.startsAt).getTime() - SOON_MINS * 60_000);
+    await scheduleAt(slotSoonId(slot.id), `${habitName} in ${SOON_MINS} minutes`, 'Finish what you are doing. The good part is almost here.', soon, {
+      slotId: slot.id,
+    });
   } catch {
     // reminders are best effort
   }
@@ -122,6 +129,7 @@ export async function cancelFocusEnd(): Promise<void> {
 export async function cancelSlotNotifications(slotId: string): Promise<void> {
   await cancel(slotStartId(slotId));
   await cancel(slotEndId(slotId));
+  await cancel(slotSoonId(slotId));
 }
 
 function dailyAt(hm: string, offsetMins = 0): { hour: number; minute: number } {
@@ -168,15 +176,12 @@ export async function syncBankNudge(data: UserData): Promise<void> {
       await cancel(ID_BANK);
       return;
     }
+    // Shortly after the workday ends, when rest is what the person wants anyway.
     const at = new Date();
-    at.setHours(18, 30, 0, 0);
+    at.setHours(0, parseHM(data.profile.workEnd) + 15, 0, 0);
     if (at.getTime() <= Date.now()) at.setDate(at.getDate() + 1);
-    await scheduleAt(
-      ID_BANK,
-      'Rest is waiting',
-      `${Math.floor(pile)} min of rest are waiting for you. Pick a time and enjoy them.`,
-      at,
-    );
+    const nudge = restNudge(pile, tonightsPick(data, at), at);
+    await scheduleAt(ID_BANK, nudge.title, nudge.body, at);
   } catch {
     // best effort
   }

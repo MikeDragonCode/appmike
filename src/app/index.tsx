@@ -24,9 +24,10 @@ import {
   seeMoment,
   summarizeDay,
   todayHint,
+  tonightsPick,
   weeklyRecap,
 } from '@/core';
-import { undo } from '@/state/actions';
+import { book, undo } from '@/state/actions';
 import { updateData, useStore } from '@/state/store';
 import { useNow } from '@/hooks/useNow';
 import { colors, space } from '@/theme';
@@ -67,6 +68,7 @@ export default function Today() {
   const moments = newMoments(data);
   const streak = getSoftStreak(data, now);
   const goal = data.profile.weeklySlotGoal;
+  const pick = focus ? null : tonightsPick(data, now);
   const week = currentWeek(data, now);
   // Once the day is closed the main action stays available but stops calling out for attention.
   const mainKind = hint.kind === 'closed' ? 'secondary' : 'primary';
@@ -169,6 +171,25 @@ export default function Today() {
         </Card>
       ) : null}
 
+      {pick ? (
+        <Card>
+          <AppText variant="label">Your usual</AppText>
+          <AppText variant="heading">{pick.habit.name}</AppText>
+          <AppText variant="small">
+            {pick.mins} min, {dayWord(pick.startsAt, now)} {fmtClock(pick.startsAt)}
+          </AppText>
+          <Button
+            small
+            title="Yes, book it"
+            style={styles.pickButton}
+            onPress={async () => {
+              const r = await book({ habitId: pick.habit.id, plannedMins: pick.mins, startsAt: pick.startsAt });
+              if (r.ok) success();
+            }}
+          />
+        </Card>
+      ) : null}
+
       {focus && focusHabit ? (
         <Card onPress={() => router.push({ pathname: '/focus', params: { habitId: focus.habitId } })} selected tint={colors.grind}>
           <AppText variant="label">Focus running</AppText>
@@ -209,5 +230,6 @@ const styles = StyleSheet.create({
   bank: { gap: space.sm, padding: space.xl, paddingVertical: space.xxl },
   bankNumber: { marginVertical: -4 },
   hint: { marginTop: space.xs, marginBottom: space.sm },
+  pickButton: { marginTop: space.sm },
   section: { gap: space.sm },
 });

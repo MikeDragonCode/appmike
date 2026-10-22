@@ -463,3 +463,13 @@ test('onboarding needs one struggle and allows as many as you like', async ({ pa
   await tap(page, 'Continue');
   await expect(page.getByText('Your rhythm')).toBeVisible();
 });
+
+test('"Your usual" books tonight\'s rest with one tap', async ({ page }) => {
+  await open(page);
+  await onboard(page);
+  await logDeepWork(page, 120); // 60 min saved
+  await expect(page.getByText('Your usual')).toBeVisible();
+  await tap(page, 'Yes, book it');
+  await expect(page.getByText('Next rest')).toBeVisible();
+  await expect(page.getByText('Your usual')).toHaveCount(0); // booked: the offer goes away
+});

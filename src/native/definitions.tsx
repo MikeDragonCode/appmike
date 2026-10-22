@@ -73,11 +73,11 @@ export const FocusActivity = createLiveActivity('FocusActivity', (props: FocusPr
   );
   return {
     banner: (
-      <HStack spacing={12} modifiers={[padding({ all: 14 }), activityBackgroundTint('#d12d20')]}>
+      <HStack spacing={12} modifiers={[padding({ all: 14 }), activityBackgroundTint('#1c1410')]}>
         <VStack alignment="leading" spacing={2}>
-          <Text modifiers={[font({ size: 13, weight: 'semibold' }), foregroundStyle('#ffffff'), lineLimit(1)]}>{props.name}</Text>
+          <Text modifiers={[font({ size: 13, weight: 'semibold' }), foregroundStyle('#eb712e'), lineLimit(1)]}>{props.name}</Text>
           {timer(34, '#ffffff')}
-          <Text modifiers={[font({ size: 12 }), foregroundStyle('#ffffff')]}>{goal ? 'to your goal, then it counts up' : 'of focus, earning rest'}</Text>
+          <Text modifiers={[font({ size: 12 }), foregroundStyle('#bdb6b0')]}>{goal ? 'to your goal, then it counts up' : 'of focus, earning rest'}</Text>
         </VStack>
         <Spacer />
       </HStack>
